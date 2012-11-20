@@ -30,12 +30,12 @@ SOFTWARE.
     var env = factory.env,
         def = factory.def,
         deps = {
-            amd: ['./modelo.js', './event.js', './defer.js'],
-            node: ['./modelo.js', './event.js', './defer.js'],
-            browser: ['Modelo', 'Modelo/Event', 'Modelo/defer']
+            amd: ['./node_modules/modelo/modelo.js', './node_modules/eventjs/event.js', './node_modules/deferjs/defer.js'],
+            node: ['modelo', 'eventjs', 'deferjs'],
+            browser: ['Modelo', 'Event', 'defer']
         };
 
-    def.call(this, 'Modelo/Deferred', deps[env], function (Modelo, Event, defer) {
+    def.call(this, 'Deferred', deps[env], function (Modelo, Event, defer) {
 
         var Deferred,
             DeferredObject,

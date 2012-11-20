@@ -7,12 +7,12 @@
     var env = factory.env,
         def = factory.def,
         deps = {
-            amd: ['lib/expect', '../modelo/deferred'],
-            node: ['./lib/expect', '../modelo/deferred.js'],
-            browser: ['expect', 'Modelo/Deferred']
+            amd: ['lib/expect', '../deferred/deferred'],
+            node: ['./lib/expect', '../deferred/deferred.js'],
+            browser: ['expect', 'Deferred']
         };
 
-    def.call(this, 'spec/modelo', deps[env], function (expect, Deferred) {
+    def.call(this, 'spec/Deferred', deps[env], function (expect, Deferred) {
 
         describe('The Deferred library', function () {
 

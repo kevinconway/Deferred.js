@@ -1,175 +1,32 @@
-=========
-Modelo.js
-=========
+===========
+Deferred.js
+===========
 
-**An isomorphic JavaScript development tool set.**
+**Deferred objects with event support.**
 
 *Status: In Development*
 
-What Is Modelo?
-===============
+What Is Deferred?
+=================
 
-Modelo is toolkit for building cross platform compatible JavaScript libraries.
+Deferred is a non-compliant implementation of the Promise interface.
 
-Developers who use Modelo gain access to three main categories of functionality:
+The Deferred.js library is a Modelo mix-in object that can be used to help
+simplify asynchronous programming patterns. The Deferred, and the limited
+promise interface that it generates, can be used to represent a value that will
+be available in the future.
 
-    -   A framework for object definitions and inheritance.
+There are many different implementations and APIs for Deferred objects and
+promises. In this library a Deferred represents a *single* value, or resource,
+that will be available at some point in the future. All callbacks registered
+with a Deferred are called with the same value just as all errbacks registered
+are called with the same error. Callbacks and errbacks are not guaranteed to
+execute in any particular order.
 
-    -   Cross platform support for asynchronous operations.
-
-    -   A standardized API for interacting with persistent storage engines.
-
-        *Note: Still a work in progress.*
-
-Tell Me More
-============
-
-JavaScript Objects
-------------------
-
-The Modelo package contains three modules related to creating and working with
-JavaScript objects: modelo.js, property.js, and relationship.js.
-
-modelo.js
-^^^^^^^^^
-
-The modelo.js module is the base for all objects in the Modelo package. It
-allows the creation and inheritance of multiple objects in an easy way::
-
-    var Animal, Lion, Eagle, Griffin, myPet;
-
-    Animal = Modelo.define();
-
-    Lion = Animal.extend();
-    Lion.prototype.roar = function () { console.log("Roar"); };
-
-    Eagle = Animal.extend(function (options) {
-        this.wingSpan = options.wingSpan || "2 Feet";
-    })
-
-    Griffin = Modelo.define(Lion, Eagle);
-
-    myPet = new Griffin({wingSpan: "12 Feet"});
-
-    myPet.roar(); // Console Output: "Roar"
-
-    myPet.wingSpan; // "12 Feet"
-
-    myPet.isInstance(Griffin); // true
-    myPet.isInstance(Eagle); // true
-    myPet.isInstance(Lion); // true
-    myPet.isInstance(Animal); // true
-
-For more detailed usage guides and API specifications, see the docs directory.
-
-property.js
-^^^^^^^^^^^
-
-The property.js module provides a way to create type validated variables for
-us in JavaScript objects::
-
-    var Person, somePerson;
-
-     Person = Modelo.define(function (options) {
-
-        this.name = new Property("string", Property.nullable(false));
-
-        this.name(options.name || "Juan Pérez");
-
-    });
-
-    somePerson = new Person();
-
-    somPerson.name(); // "Juan Pérez"
-
-    somePerson.name("John Smith");
-    somePerson.name(); // "John Smith"
-
-    somPerson.name(null); // Throws error due to Property.nullable(false).
-
-    somePerson.name(1234); // Throws error due to incompatible type.
-
-For more detailed usage guides and API specifications, see the docs directory.
-
-relationship.js
-^^^^^^^^^^^^^^^
-
-The relationship.js module provides the same functionality as the property.js
-module except that it deals with properties that hold related objects rather
-than primitives::
-
-    var Person, john, juan;
-
-    Person = Modelo.define(function () {
-
-        this.bestFriend = new Relationship("hasone", Person);
-
-    });
-
-    john = new Person();
-    juan = new Person();
-
-    john.bestFriend(juan);
-    juan.bestFriend(john);
-
-    john.bestFriend() === juan; // true
-    juan.bestFriend() === john; // true
-
-For more detailed usage guides and API specifications, see the docs directory.
-
-Cross Platform Async
---------------------
-
-A combination of the asynchronous programming pattern and nonblocking IO **is**
-the concurrency model for JavaScript applications. The Modelo package simplifies
-the process of writing cross platform compatible async libraries through three
-modules: defer.js, event.js, and deferred.js.
-
-defer.js
-^^^^^^^^
-
-The defer.js module exposes a single function called `defer`. This function
-is an abstraction over platform specif methods for deferring the execution of
-a function until the next cycle of the event loop. In Node.js this function
-aliases process.nextTick. In modern browsers this function leverages
-window.postMessage. In legacy browsers this function falls back on setTimeout.
+Show Me
+=======
 
 ::
-
-    function logSomething() { console.log("ASYNC"); }
-
-    defer(logSomething);
-
-    // At some point later:
-    // Console Output: "ASYNC"
-
-For more detailed usage guides and API specifications, see the docs directory.
-
-event.js
-^^^^^^^^
-
-The event.js module provides an object that can be mixed into other objects
-generated by the modelo.js module. The event mixin adds, to any object, the
-ability to have event callbacks registered and triggered in a way that leverages
-the asynchronous nature of JavaScript::
-
-    var Person = Modelo.define(Event),
-        somePerson = new Person;
-
-    somePerson.on("birthday", function () { console.log("Happy B-Day."); })
-
-    somPerson.trigger("birthday");
-
-    // At some point later:
-    // Console Output: "Happy B-Day."
-
-For more detailed usage guides and API specifications, see the docs directory.
-
-deferred.js
-^^^^^^^^^^^
-
-The deferred.js module helps to simplify the process of writing and managing
-your own asynchronous functions::
 
     // Wrap async operations in functions that return a deferred.
     function getRemoteData() {
@@ -211,15 +68,6 @@ your own asynchronous functions::
 
 For more detailed usage guides and API specifications, see the docs directory.
 
-Remaining Development Roadmap
-=============================
-
--   Finalize persistent storage API
-
--   Increase unit test coverage
-
--   Expand usage and API documentation
-
 Setup Instructions
 ==================
 
@@ -234,43 +82,27 @@ RequireJS.
 Node.js
 -------
 
-Node.js developers can `$ NPM install modelo` and `require()` away. The module
-exported when running `require("modelo")` is the modelo.js module. All other
-modules can be loaded as `require("modelo/<module>")`.
+This package can be loaded using `require()` just like any other in Node.js.
 
 Browser (<script>)
 ------------------
 
 Developers working with a normal browser environment can use regular script
-tags to load modelo modules. Modelo.js loads into a single global `Modelo`
-object. As with any JavaScript loading with <script> tags, the proper load
-order must be used::
+tags to load the package. Deferred loads into a global `Deferred` function.
 
-    // Modules with no dependencies
-    <script src="modelo.js"></script>
-    <script src="defer.js"></script>
-
-    // Modules depending on modelo.js
-    <script src="property.js"></script>
-    <script src="relationship.js"></script>
-
-    // Modules depending on modelo.js and defer.js
-    <script src="event.js"></script>
-
-    // Modules depending on modelo.js, defer.js, and event.js
     <script src="deferred.js"></script>
 
 Browser (AMD)
 -------------
 
-Developers working with an AMD loader like RequireJS can add modelo.js modules
-as though they are normal dependencies.
+Developers working with an AMD loader like RequireJS can add Deferred as though
+it were normal dependencies.
 
 License
 =======
 
-Modelo
-------
+Deferred
+--------
 
 This project is released and distributed under an MIT License.
 
