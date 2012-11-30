@@ -45,7 +45,7 @@ for use of this library and is used here only for demonstration purposes.
 
     function getRSS() {
 
-        var Deferred = new Modelo.Deferred(); // new keyword optional
+        var Deferred = new Deferred(); // new keyword optional
 
         $.ajax({
             url: "myrss.com",
@@ -114,7 +114,7 @@ but only resolve when all the contained promises are resolved::
     var rssPromise = getRSS(),
         jsonPromise = getJSON(),
         htmlPromise = getHTML(),
-        collection = new Modelo.Deferred.PromiseCollection();
+        collection = new Deferred.PromiseCollection();
 
     collection.add("rss", rssPromise).add("json", jsonPromise);
     collection.add("html", htmlPromise);
@@ -155,10 +155,10 @@ required::
 
     typeof Deferred.PromiseCollection === "function"; // true
 
-In a browser environment, the Deferred library will load in the global `Modelo`
-object under `Modelo.Deferred`::
+In a browser environment, the Deferred library will load in the global
+`Deferred`::
 
-    typeof Modelo.Deferred === "function"; // true
+    typeof Deferred === "function"; // true
 
 Deferred
 --------

@@ -82,21 +82,63 @@ RequireJS.
 Node.js
 -------
 
-This package can be loaded using `require()` just like any other in Node.js.
+This package is published through NPM under the name `deferredjs` and can be
+installed with::
+
+    $ npm install deferredjs
+
+This should automatically install all dependencies (modelo, deferjs, and
+eventjs).
+
+This package can then be loaded with `require('deferredjs')`.
 
 Browser (<script>)
 ------------------
 
 Developers working with a normal browser environment can use regular script
-tags to load the package. Deferred loads into a global `Deferred` function.
+tags to load the package. This package has dependencies on these other
+packages:
 
+-   `Modelo <https://github.com/kevinconway/Modelo.js>`_
+
+-   `Defer <https://github.com/kevinconway/Defer.js>`_
+
+-   `Event <https://github.com/kevinconway/Event.js>`_
+
+The load order should be something like this::
+
+    <script src="modelo.js"></script>
+    <script src="defer.js"></script>
+    <script src="event.js"></script>
     <script src="deferred.js"></script>
+
+The package loads into a global variable named `Deferred`.
 
 Browser (AMD)
 -------------
 
-Developers working with an AMD loader like RequireJS can add Deferred as though
-it were normal dependencies.
+Developers working with RequireJS can also load this package with `require()`.
+
+One thing to note, however, is that this package has its own dependencies that
+must also be available through `require()`. Developers with NPM installed can
+make use of the pre-configured dependency options by doing the following::
+
+    $ npm install deferredjs
+    $ cd node_modules/deferredjs/node_modules/eventjs
+    $ npm install
+
+Now when you reference `deferredjs` as a dependency it should properly load
+its own dependencies.
+
+If you require something more specific then you can edit the dependency options
+for this package by looking for the following line 33 which should be::
+
+    amd: ['./node_modules/modelo/modelo.js',
+            './node_modules/eventjs/event.js',
+            './node_modules/deferjs/defer.js'],
+
+Simply change these paths to match where you have placed the corresponding
+files.
 
 License
 =======
