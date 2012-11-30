@@ -47,13 +47,13 @@ SOFTWARE.
         // executed asynchronously to be passed an input value.
         callWithValue = function (fn, value) {
 
-                return function () {
+            return function () {
 
-                    fn(value);
-
-                };
+                fn(value);
 
             };
+
+        };
 
         // PromiseObjects in this context are specialized wrappers around
         // DeferredObjects that limit what actions can be performed on the
