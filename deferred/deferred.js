@@ -24,7 +24,7 @@ SOFTWARE.
 /*global require, define, module
 
 */
-(function (factory) {
+(function (ctx, factory) {
     "use strict";
 
     var env = factory.env,
@@ -35,7 +35,7 @@ SOFTWARE.
             browser: ['Modelo', 'Event', 'defer']
         };
 
-    def.call(this, 'Deferred', deps[env], function (Modelo, Event, defer) {
+    def.call(ctx, 'Deferred', deps[env], function (Modelo, Event, defer) {
 
         var Deferred,
             DeferredObject,
@@ -407,7 +407,7 @@ SOFTWARE.
 
     });
 
-}.call(this, (function () {
+}(this, (function (ctx) {
     "use strict";
 
     var currentEnvironment,
@@ -424,7 +424,7 @@ SOFTWARE.
 
         currentEnvironment = 'node';
 
-    } else if (this.window !== undefined) {
+    } else if (ctx.window !== undefined) {
 
         currentEnvironment = 'browser';
 
@@ -507,7 +507,7 @@ SOFTWARE.
 
         }
 
-    }.call());
+    }());
 
 
     return {
@@ -515,4 +515,4 @@ SOFTWARE.
         def: generator
     };
 
-}.call(this))));
+}(this))));

@@ -1,7 +1,7 @@
 /*global require, define, module, describe, it, xit
 
 */
-(function (factory) {
+(function (ctx, factory) {
     "use strict";
 
     var env = factory.env,
@@ -12,7 +12,7 @@
             browser: ['expect', 'Deferred']
         };
 
-    def.call(this, 'spec/Deferred', deps[env], function (expect, Deferred) {
+    def.call(ctx, 'spec/Deferred', deps[env], function (expect, Deferred) {
 
         describe('The Deferred library', function () {
 
@@ -139,7 +139,7 @@
 
     });
 
-}.call(this, (function () {
+}(this, (function (ctx) {
     "use strict";
 
     var currentEnvironment,
@@ -156,7 +156,7 @@
 
         currentEnvironment = 'node';
 
-    } else if (this.window !== undefined) {
+    } else if (ctx.window !== undefined) {
 
         currentEnvironment = 'browser';
 
@@ -239,7 +239,7 @@
 
         }
 
-    }.call());
+    }());
 
 
     return {
@@ -247,4 +247,4 @@
         def: generator
     };
 
-}.call(this))));
+}(this))));
