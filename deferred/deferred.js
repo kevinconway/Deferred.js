@@ -129,7 +129,7 @@ SOFTWARE.
             this.errbacks = [];
             this.resolved = false;
             this.failed = false;
-            this.completed = true;
+            this.completed = false;
 
         });
 
@@ -198,7 +198,7 @@ SOFTWARE.
 
             var x;
 
-            if (this.complete === true) {
+            if (this.completed === true) {
                 return this;
             }
 
@@ -230,7 +230,7 @@ SOFTWARE.
 
             var x;
 
-            if (this.complete === true) {
+            if (this.completed === true) {
                 return this;
             }
 
