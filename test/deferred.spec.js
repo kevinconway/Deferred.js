@@ -1,7 +1,7 @@
 /*global require, define, module, describe, it, xit
 
 */
-(function (factory) {
+(function (ctx, factory) {
     "use strict";
 
     var env = factory.env,
@@ -12,7 +12,7 @@
             browser: ['expect', 'Deferred']
         };
 
-    def.call(this, 'spec/Deferred', deps[env], function (expect, Deferred) {
+    def.call(ctx, 'spec/Deferred', deps[env], function (expect, Deferred) {
 
         describe('The Deferred library', function () {
 
@@ -139,7 +139,7 @@
 
     });
 
-}.call(this, (function () {
+}(this, (function (ctx) {
     "use strict";
 
     var currentEnvironment,
@@ -156,7 +156,7 @@
 
         currentEnvironment = 'node';
 
-    } else if (this.window !== undefined) {
+    } else if (ctx.window !== undefined) {
 
         currentEnvironment = 'browser';
 
@@ -188,7 +188,7 @@
 
                 }
 
-                module.exports = mod.apply(this, dep_list);
+                module.exports = mod.apply(ctx, dep_list);
 
             };
 
@@ -201,7 +201,7 @@
             return function (name, deps, mod) {
 
                 var namespaces = name.split('/'),
-                    root = this,
+                    root = ctx,
                     dep_list = [],
                     current_scope,
                     current_dep,
@@ -226,11 +226,12 @@
                 current_scope = root;
                 for (i = 1; i < namespaces.length; i = i + 1) {
 
-                    current_scope = current_scope[namespaces[i - 1]] || {};
+                    current_scope = current_scope[namespaces[i - 1]] =
+                                    current_scope[namespaces[i - 1]] || {};
 
                 }
 
-                current_scope[namespaces[i - 1]] = mod.apply(this, dep_list);
+                current_scope[namespaces[i - 1]] = mod.apply(ctx, dep_list);
 
             };
 
@@ -239,7 +240,7 @@
 
         }
 
-    }.call());
+    }());
 
 
     return {
@@ -247,4 +248,4 @@
         def: generator
     };
 
-}.call(this))));
+}(this))));
