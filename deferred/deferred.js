@@ -24,7 +24,7 @@ SOFTWARE.
 /*global require, define, module
 
 */
-(function (factory) {
+(function (ctx, factory) {
     "use strict";
 
     var env = factory.env,
@@ -35,7 +35,7 @@ SOFTWARE.
             browser: ['Modelo', 'Event', 'defer']
         };
 
-    def.call(this, 'Deferred', deps[env], function (Modelo, Event, defer) {
+    def.call(ctx, 'Deferred', deps[env], function (Modelo, Event, defer) {
 
         var Deferred,
             DeferredObject,
@@ -407,7 +407,7 @@ SOFTWARE.
 
     });
 
-}.call(this, (function () {
+}(this, (function (ctx) {
     "use strict";
 
     var currentEnvironment,
@@ -424,7 +424,7 @@ SOFTWARE.
 
         currentEnvironment = 'node';
 
-    } else if (this.window !== undefined) {
+    } else if (ctx.window !== undefined) {
 
         currentEnvironment = 'browser';
 
@@ -456,7 +456,7 @@ SOFTWARE.
 
                 }
 
-                module.exports = mod.apply(this, dep_list);
+                module.exports = mod.apply(ctx, dep_list);
 
             };
 
@@ -469,7 +469,7 @@ SOFTWARE.
             return function (name, deps, mod) {
 
                 var namespaces = name.split('/'),
-                    root = this,
+                    root = ctx,
                     dep_list = [],
                     current_scope,
                     current_dep,
@@ -494,11 +494,12 @@ SOFTWARE.
                 current_scope = root;
                 for (i = 1; i < namespaces.length; i = i + 1) {
 
-                    current_scope = current_scope[namespaces[i - 1]] || {};
+                    current_scope = current_scope[namespaces[i - 1]] =
+                                    current_scope[namespaces[i - 1]] || {};
 
                 }
 
-                current_scope[namespaces[i - 1]] = mod.apply(this, dep_list);
+                current_scope[namespaces[i - 1]] = mod.apply(ctx, dep_list);
 
             };
 
@@ -507,7 +508,7 @@ SOFTWARE.
 
         }
 
-    }.call());
+    }());
 
 
     return {
@@ -515,4 +516,4 @@ SOFTWARE.
         def: generator
     };
 
-}.call(this))));
+}(this))));
