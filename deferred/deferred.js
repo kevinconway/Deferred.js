@@ -198,7 +198,7 @@ SOFTWARE.
 
             var x;
 
-            if (this.complete === true) {
+            if (this.completed === true) {
                 return this;
             }
 
@@ -230,7 +230,7 @@ SOFTWARE.
 
             var x;
 
-            if (this.complete === true) {
+            if (this.completed === true) {
                 return this;
             }
 
