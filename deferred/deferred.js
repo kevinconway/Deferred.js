@@ -129,7 +129,7 @@ SOFTWARE.
             this.errbacks = [];
             this.resolved = false;
             this.failed = false;
-            this.completed = true;
+            this.completed = false;
 
         });
 
