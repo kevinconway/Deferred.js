@@ -4,7 +4,9 @@ Deferred.js
 
 **Deferred objects with event support.**
 
-*Status: Stable*
+.. image:: https://travis-ci.org/kevinconway/Deferred.js.png?branch=master
+    :target: https://travis-ci.org/kevinconway/Deferred.js
+    :alt: Current Build Status
 
 What Is Deferred?
 =================
