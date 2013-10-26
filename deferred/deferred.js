@@ -65,8 +65,8 @@ SOFTWARE.
         // A) none of them are ratified yet and B) they all over complicate the
         // purpose of a promise.
         //
-        // In this module, promises are simply limited interfaces to a deferred.
-        // Promises do not expose a set of half-baked flow control functions.
+        // In this module, promises are simply limited interfaces to a
+        // deferred. Promises do not expose any form of flow control functions.
         //
         // They simply allow interactions with a DeferredObject which is
         // documented below.
@@ -123,7 +123,7 @@ SOFTWARE.
         // When that resource is failed to load all errback function are
         // executed asynchronously, in no given order, and with the error
         // that caused the failure as a single input parameter.
-        DeferredObject = Event.extend(function (options) {
+        DeferredObject = Event.extend(function () {
 
             this.callbacks = [];
             this.errbacks = [];
@@ -141,7 +141,7 @@ SOFTWARE.
         //
         // If the value of the deferred is unimportant to the callback
         // it can, alternatively, be bound to the `success` and `done`
-        // events that are emitted.
+        // events that are emitted from the deferred.
         DeferredObject.prototype.callback = function (fn) {
 
             if (this.resolved === true) {
@@ -262,14 +262,15 @@ SOFTWARE.
 
         // Admittedly, this construct borders on flow control. Promise
         // collections basically allow for the combination of multiple
-        // promises into a single promise that resolved when all the contained
+        // promises into a single promise that resolves when all the contained
         // promises have been resolved. Likewise, the collection fails when
         // any of the contained promises fail.
         //
         // Unlike standard promises, the value passed to succes callbacks
         // are always object literals. These object literals contain key=>value
         // pairs of the values returned by the contained callbacks. The keys
-        // are determined when the promises are given to the promise collection.
+        // are determined when the promises are given to the promise
+        // collection.
         //
         // For example, assume that p1, p2, and p3 are promises returned by
         // asynchronous functions that will be resolved to the values 1, 2, and
@@ -316,7 +317,7 @@ SOFTWARE.
 
             var op = this;
 
-            promise.callback(function (value) {
+            promise.callback(function () {
 
                 var x,
                     finalValue = {};
