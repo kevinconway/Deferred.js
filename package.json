@@ -2,7 +2,7 @@
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
   "description": "Deferred objects with event support",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
     "type": "git",
