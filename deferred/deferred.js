@@ -484,7 +484,8 @@ SOFTWARE.
 
                     for (x = 0; x < current_dep.length; x = x + 1) {
 
-                        current_scope = current_scope[current_dep[x]] || {};
+                        current_scope = current_scope[current_dep[x]] =
+                                        current_scope[current_dep[x]] || {};
 
                     }
 
