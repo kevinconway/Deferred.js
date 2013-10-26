@@ -20,13 +20,13 @@ are called with the same error. Callbacks and errbacks are not guaranteed to
 execute in any particular order.
 
 All Deferred objects can generate a promise interface. Promises are simply
-limited interfaces to Deferred objects. Promises expose all of a Deferred object
-with the exception of allowing the resolution or failure of a Deferred.
+limited interfaces to Deferred objects. Promises expose all of a Deferred
+object with the exception of allowing the resolution or failure of a Deferred.
 
 To support more complex asynchronous patterns, promise collections may be used
 to aggregate promises into a single promise. This allows promises to be
-"chained" in such a way that callbacks and errbacks are only triggered after all
-promises have been resolved.
+"chained" in such a way that callbacks and errbacks are only triggered after
+all promises have been resolved.
 
 Usage Examples
 ==============
@@ -35,11 +35,12 @@ Deferred Objects
 ----------------
 
 Deferred objects can be used to manage values, or resources, which are not yet
-available. Deferred objects are typically created inside of functions that would
-typically accept a callback as an argument. Rather than accepting a single
-callback, create a Deferred and return a promise. To illustrate, this example
-will show a use of jQuery's AJAX methods. jQuery, however, is in no way required
-for use of this library and is used here only for demonstration purposes.
+available. Deferred objects are typically created inside of functions that
+would, otherwise, accept a callback as an argument. Rather than accepting a
+single callback, create a Deferred and return a promise. To illustrate, this
+example will show a use of jQuery's AJAX methods. jQuery, however, is in no way
+required for use of this library and is used here only for demonstration
+purposes.
 
 ::
 
@@ -107,8 +108,8 @@ Promise Collections
 
 There are many scenarios in which callbacks need to be run once a series of
 promises have been resolved. To support this developers should use promise
-collections. Promise collections expose virtually the same interface as promises
-but only resolve when all the contained promises are resolved::
+collections. Promise collections expose virtually the same interface as
+promises but only resolve when all the contained promises are resolved::
 
     // Assume these "get" functions are async and return promises.
     var rssPromise = getRSS(),
@@ -126,8 +127,8 @@ but only resolve when all the contained promises are resolved::
     });
 
 Promise collections expose all of the same methods as promises with one
-addition: the `add` method. The `add` method registers and promise with
-the collections and assigns a keyword to the promise.
+addition: the `add` method. The `add` method registers a promise with the
+collection and assigns a keyword to the promise.
 
 The biggest difference between promises and promise collections is that
 collections resolve with an object containing the values of all the resolved
@@ -195,10 +196,10 @@ complete(fn)
 
 *Aliases: always, end*
 
-Registers a callback to be executed upon completion, whether success or failure,
-of this Deferred. Functions registered with this method are passed the value of
-the `resolve` or `fail` methods. Functions registered after the Deferred has
-already been completed will be automatically executed.
+Registers a callback to be executed upon completion, whether success or
+failure, of this Deferred. Functions registered with this method are passed the
+value of the `resolve` or `fail` methods. Functions registered after the
+Deferred has already been completed will be automatically executed.
 
 All complete callbacks are launched asynchronously using the defer.js library.
 
@@ -227,9 +228,10 @@ Promise objects can be created with the `new` keyword and accept a Deferred
 object as an argument.
 
 Promise objects expose a limited interface to a Deferred object that can be
-returned to the caller of a function. The interface it exposes allows developers
-to register callbacks and errbacks, but prevents them from calling the `resolve`
-or `fail` methods and from changing the final value of the Deferred.
+returned to the caller of a function. The interface it exposes allows
+developers to register callbacks and errbacks, but prevents them from calling
+the `resolve` or `fail` methods and from changing the final value of the
+Deferred.
 
 callback(fn)
 ^^^^^^^^^^^^
@@ -260,10 +262,10 @@ complete(fn)
 
 *Aliases: always, end*
 
-Registers a callback to be executed upon completion, whether success or failure,
-of this promise. Functions registered with this method are passed the value of
-the `resolve` or `fail` methods. Functions registered after the promise has
-already been completed will be automatically executed.
+Registers a callback to be executed upon completion, whether success or
+failure, of this promise. Functions registered with this method are passed the
+value of the `resolve` or `fail` methods. Functions registered after the
+promise has already been completed will be automatically executed.
 
 All complete callbacks are launched asynchronously using the defer.js library.
 
@@ -273,9 +275,8 @@ Promise Collection
 Promise collections can be created with the `new` keyword.
 
 Promise collections are Modelo objects and can be given an argument named
-"promises" which contains an object literal. The object should contain key value
-pairs of promises and the keys under which those promise values should be
-exposed.
+"promises" which contains an object literal. The object should contain key
+value pairs of promises.
 
 Promise collections are extended from promises and expose a virtually identical
 interface.
@@ -297,9 +298,9 @@ errback(fn)
 
 *Aliases: failure, error*
 
-Registers a callback function to be executed upon failure of any promise in this
-promise collection. Errbacks will be passed an object literal containing key
-value pairs for the errors of each promise that failed. Promises in this
+Registers a callback function to be executed upon failure of any promise in
+this promise collection. Errbacks will be passed an object literal containing
+key value pairs for the errors of each promise that failed. Promises in this
 collections that did not fail will be absent from the object literal.
 
 All errbacks are launched asynchronously using the defer.js library.
