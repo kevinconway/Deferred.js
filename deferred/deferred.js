@@ -35,20 +35,7 @@ SOFTWARE.
       var Deferred,
         DeferredObject,
         PromiseObject,
-        PromiseCollectionObject,
-        callWithValue;
-
-      // This specialized scope is used later on to allow function that are
-      // executed asynchronously to be passed an input value.
-      callWithValue = function (fn, value) {
-
-        return function () {
-
-          fn(value);
-
-        };
-
-      };
+        PromiseCollectionObject;
 
       // PromiseObjects in this context are specialized wrappers around
       // DeferredObjects that limit what actions can be performed on the
@@ -140,7 +127,7 @@ SOFTWARE.
       DeferredObject.prototype.callback = function (fn) {
 
         if (this.resolved === true) {
-          defer(callWithValue(fn, this.value));
+          defer(defer.bind(fn, null, this.value));
           return this;
         }
 
@@ -167,7 +154,7 @@ SOFTWARE.
       DeferredObject.prototype.errback = function (fn) {
 
         if (this.failed === true) {
-          defer(callWithValue(fn, this.value));
+          defer(defer.bind(fn, null, this.value));
           return this;
         }
 
@@ -203,7 +190,7 @@ SOFTWARE.
 
         for (x = 0; x < this.callbacks.length; x = x + 1) {
 
-          defer(callWithValue(this.callbacks[x], value));
+          defer(defer.bind(this.callbacks[x], null, value));
 
         }
 
@@ -235,7 +222,7 @@ SOFTWARE.
 
         for (x = 0; x < this.errbacks.length; x = x + 1) {
 
-          defer(callWithValue(this.errbacks[x], value));
+          defer(defer.bind(this.errbacks[x], null, value));
 
         }
 
