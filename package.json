@@ -10,7 +10,7 @@
   },
   "main": "./deferred/deferred.js",
   "scripts": {
-    "test": "mocha"
+    "test": "./test/install_libs && mocha"
   },
   "dependencies": {
 

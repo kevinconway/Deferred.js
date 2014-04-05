@@ -1,10 +1,10 @@
 <html>
   <head>
-    <title>Modelo Tests</title>
+    <title>Deferred.js Tests</title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <link rel="stylesheet" href="./lib/style.css" />
+    <link rel="stylesheet" href="./lib/mocha.css" />
 
     <script>
       if(typeof String.prototype.trim !== 'function') {
@@ -14,8 +14,8 @@
       }
     </script>
 
-    <script src="./lib/mocha.js"></script>
     <script src="./lib/expect.js"></script>
+    <script src="./lib/mocha.js"></script>
 
     <script>
       mocha.setup({
@@ -31,10 +31,10 @@
       }
     </script>
 
-    <script src="../node_modules/modelo/modelo/modelo.js"></script>
-    <script src="../node_modules/deferjs/defer/defer.js"></script>
-    <script src="../node_modules/eventjs/event/event.js"></script>
-    <script src="../deferred/deferred.js"></script>
+    <script src="./lib/modelo.js"></script>
+    <script src="./lib/defer.js"></script>
+    <script src="./lib/event.js"></script>
+    <script src="./lib/deferred.js"></script>
 
     <script src="./deferred.spec.js"></script>
 
