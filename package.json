@@ -2,7 +2,7 @@
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
   "description": "Deferred objects with event support",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
     "type": "git",
@@ -14,9 +14,9 @@
   },
   "dependencies": {
 
-    "modelo": "1.x.x",
-    "deferjs": "1.x.x",
-    "eventjs": "1.x.x"
+    "modelo": "3.x.x",
+    "deferjs": "2.x.x",
+    "eventjs": "2.x.x"
 
     },
   "devDependencies": {},
