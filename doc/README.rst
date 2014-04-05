@@ -62,7 +62,7 @@ purposes.
 
     }
 
-Now the `getRSS function is both asynchronous, returns a Deferred, and allows
+Now the `getRSS` function is both asynchronous, returns a Deferred, and allows
 for multiple callbacks that make use of the eventual values::
 
     var rssPromise = getRSS();
@@ -107,7 +107,7 @@ Promise Collections
 -------------------
 
 There are many scenarios in which callbacks need to be run once a series of
-promises have been resolved. To support this developers should use promise
+promises have been resolved. To support this, developers should use promise
 collections. Promise collections expose virtually the same interface as
 promises but only resolve when all the contained promises are resolved::
 
@@ -143,10 +143,9 @@ Exports
 The Deferred.js library exports several objects. The primary object exported
 is a function that returns a new Deferred object when called (`new` keyword
 optional). Attached to this object are the Deferred, Promise, and Promise
-Collection objects. In Node.js and AMD environments, this library can be
-required::
+Collection objects. In Node.js environments, this library can be required::
 
-    var Deferred = require('Deferred');
+    var Deferred = require('deferredjs');
 
     typeof Deferred === "function"; // true
 
@@ -157,9 +156,15 @@ required::
     typeof Deferred.PromiseCollection === "function"; // true
 
 In a browser environment, the Deferred library will load in the global
-`Deferred`::
+`deferredjs`::
 
-    typeof Deferred === "function"; // true
+    typeof deferredjs.Deferred === "function"; // true
+
+    typeof deferredjs.Deferred === "function"; // true
+
+    typeof deferredjs.Promise === "function"; // true
+
+    typeof deferredjs.PromiseCollection === "function"; // true
 
 Deferred
 --------
