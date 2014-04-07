@@ -36,10 +36,6 @@ if [[ ! -a "${LIB_DIR}/defer.js" ]]; then
     ln -s "${MODULES_DIR}/deferjs/defer/defer.js" "${LIB_DIR}/defer.js"
 fi
 
-if [[ ! -a "${LIB_DIR}/event.js" ]]; then
-    ln -s "${MODULES_DIR}/eventjs/event/event.js" "${LIB_DIR}/event.js"
-fi
-
 if [[ ! -a "${MODULES_DIR}/deferredjs" ]]; then
     ln -s "${DEFERRED_DIR}" "${MODULES_DIR}/deferredjs"
 fi

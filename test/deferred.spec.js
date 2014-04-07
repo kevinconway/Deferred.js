@@ -26,7 +26,11 @@
 
           expect(typeof Deferred.Promise).to.be("function");
 
-          expect(typeof Deferred.PromiseCollection).to.be("function");
+          expect(typeof Deferred.Collection).to.be("object");
+
+          expect(typeof Deferred.Collection.All).to.be("function");
+
+          expect(typeof Deferred.Collection.Any).to.be("function");
 
         });
 
@@ -40,9 +44,6 @@
             successObject.test = value;
 
             expect(successObject.test).to.be(value);
-
-            expect(t.resolved).to.be(true);
-            expect(t.completed).to.be(true);
 
             done();
 
@@ -65,9 +66,6 @@
 
             expect(errorObject.test).to.be(value);
 
-            expect(t.failed).to.be(true);
-            expect(t.completed).to.be(true);
-
             done();
 
           });
@@ -85,14 +83,14 @@
             successObject = {};
 
           expect(p.callback).to.be.ok(t.callback);
+          expect(p.value).to.be(undefined);
+          expect(p.callbacks).to.be(undefined);
+          expect(p.errbacks).to.be(undefined);
 
           p.callback(function (value) {
             successObject.test = value;
 
             expect(successObject.test).to.be(value);
-
-            expect(p.resolved()).to.be(true);
-            expect(p.completed()).to.be(true);
 
             done();
 
@@ -106,28 +104,54 @@
 
         });
 
-        it('produces promise collections', function (done) {
+        describe('The Any Collection', function () {
 
-          var d1 = new Deferred(),
-            d2 = new Deferred(),
-            d3 = new Deferred(),
-            t1 = d1.promise(),
-            t2 = d2.promise(),
-            t3 = d3.promise(),
-            c1 = new Deferred.PromiseCollection();
+          it('Resolves on the first resolved promise.', function (done) {
 
-          c1.add("t1", t1).add("t2", t2).add("t3", t3);
+            var d1 = new Deferred(),
+              d2 = new Deferred(),
+              d3 = new Deferred(),
+              c = Deferred.Collection.Any(d1, d2, d3);
 
-          c1.callback(function (values) {
-            expect(values.t1).to.be(1);
-            expect(values.t2).to.be(2);
-            expect(values.t3).to.be(3);
-            done();
+            c.callback(function (value) {
+
+              expect(value).to.be(true);
+              done();
+
+            });
+
+            d1.resolve(true);
+            d2.resolve(false);
+            d3.resolve(false);
+
           });
 
-          d1.resolve(1);
-          d2.resolve(2);
-          d3.resolve(3);
+        });
+
+        describe('The All Collection', function () {
+
+          it('Resolves after all promises', function (done) {
+
+            var d1 = new Deferred(),
+              d2 = new Deferred(),
+              d3 = new Deferred(),
+              c = Deferred.Collection.All(d1, d2, d3);
+
+            c.callback(function (values) {
+
+              expect(values.length).to.be(3);
+              expect(values[0]).to.be(true);
+              expect(values[1]).to.be(false);
+              expect(values[2]).to.be(null);
+              done();
+
+            });
+
+            d1.resolve(true);
+            d2.resolve(false);
+            d3.resolve(null);
+
+          });
 
         });
 
