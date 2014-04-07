@@ -2,7 +2,7 @@
 Deferred.js
 ===========
 
-**Cross platform deferred objects with event support.**
+**Cross platform deferred objects.**
 
 .. image:: https://travis-ci.org/kevinconway/Deferred.js.png?branch=master
     :target: https://travis-ci.org/kevinconway/Deferred.js
@@ -11,19 +11,15 @@ Deferred.js
 What Is Deferred?
 =================
 
-Deferred is a non-compliant implementation of the Promise interface.
+A deferred is an object that represents a future value. Its purpose is to help
+simplify async programming patterns.
 
-The Deferred.js library is a Modelo mix-in object that can be used to help
-simplify asynchronous programming patterns. The Deferred, and the limited
-promise interface that it generates, can be used to represent a value that will
-be available in the future.
+This package contains several tools similar in nature to Promises. However,
+this package is not compliant with the Promises/A+ specification or the pending
+ECMA draft.
 
-There are many different implementations and APIs for Deferred objects and
-promises. In this library a Deferred represents a *single* value, or resource,
-that will be available at some point in the future. All callbacks registered
-with a Deferred are called with the same value just as all errbacks registered
-are called with the same error. Callbacks and errbacks are not guaranteed to
-execute in any particular order.
+For the purposes of this library, a deferred represents a future value and a
+promise is a read-only interface for a deferred.
 
 Show Me
 =======
@@ -93,13 +89,10 @@ packages:
 
 -   `Defer <https://github.com/kevinconway/Defer.js>`_
 
--   `Event <https://github.com/kevinconway/Event.js>`_
-
 The load order should be something like this::
 
     <script src="modelo.js"></script>
     <script src="defer.js"></script>
-    <script src="event.js"></script>
     <script src="deferred.js"></script>
 
 The package loads into a global variable named `deferredjs`.
