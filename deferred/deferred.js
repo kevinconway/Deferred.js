@@ -219,6 +219,14 @@ SOFTWARE.
       // neither it nor the `fail` method have any effect.
       DeferredObject.prototype.resolve = function (value) {
 
+        // TypeError if value is the deferred.
+        // A+ Promise Resolution Procedure 1.
+        if (value === this) {
+
+          throw new TypeError("Cannot resolve a deferred with itself.");
+
+        }
+
         var x;
 
         if (this.resolved === true || this.failed === true) {
@@ -227,8 +235,30 @@ SOFTWARE.
 
         }
 
-        this.resolved = true;
+        // Value is a promise. Adopt the state.
+        // If value is thenable but 'then' fails: fail with a reason.
+        // A+ Promise Resolution Procedure 2 and 3.
+        if (!!value && !!value.then && typeof value.then === "function") {
+
+          try {
+
+            value.then(
+              defer.bind(this.resolve, this),
+              defer.bind(this.fail, this)
+            );
+
+          } catch (err) {
+
+            this.fail(err);
+
+          }
+
+          return this;
+
+        }
+
         this.value = value;
+        this.resolved = true;
 
         this.callbacks.reverse();
         for (x = this.callbacks.length - 1; x >= 0; x = x - 1) {
