@@ -37,6 +37,8 @@ SOFTWARE.
         PromiseObject,
         CollectionModule;
 
+      // Run a function and return a thenable. If the function does not return
+      // a thenable then wrap the returned value in one.
       function executeAndReturnPromise(fn) {
 
         var fnPromise,
@@ -65,12 +67,15 @@ SOFTWARE.
 
       }
 
+      // Convert any function into a version that returns a thenable.
       function convert(fn) {
 
         return defer.bind(executeAndReturnPromise, null, fn);
 
       }
 
+      // Set a deferred to resolve/reject with the values produced by
+      // some function.
       function proxy(deferred, fn) {
 
         var args = Array.prototype.slice.call(arguments, 2),
@@ -81,6 +86,8 @@ SOFTWARE.
 
       }
 
+      // Generate a read-only interface (no resolution or rejection methods)
+      // for a given deferred. Input: {"deferred": <> }.
       PromiseObject = Modelo.define(function (options) {
 
         this.callback = function (fn) {
@@ -179,6 +186,10 @@ SOFTWARE.
       DeferredObject.prototype.failure = DeferredObject.prototype.errback;
       DeferredObject.prototype.error = DeferredObject.prototype.errback;
 
+      // A+ compliant "then" method. It accepts two optional arguments which
+      // represent the onResolve and onReject handlers. The return value is
+      // a promise interface for a deferred that is resolved/failed based on
+      // the results of the given handlers.
       DeferredObject.prototype.then = function then(callback, errback) {
 
         var d = new DeferredObject();
@@ -372,9 +383,6 @@ SOFTWARE.
 
       }());
 
-      // Similar to other modules in this package, the interface returned
-      // by this module is a set of wrappers around the actual objects.
-      //
       // In this case deferred objects can be created in any of the following
       // ways::
       //
@@ -396,6 +404,8 @@ SOFTWARE.
         return new PromiseObject({"deferred": d});
       };
 
+      // Deferred.Collection exposes an object containing the collection
+      // generator methods.
       Deferred.Collection = CollectionModule;
 
       return Deferred;
