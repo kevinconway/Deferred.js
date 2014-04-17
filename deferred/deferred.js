@@ -90,14 +90,14 @@ SOFTWARE.
       // for a given deferred. Input: {"deferred": <> }.
       PromiseObject = Modelo.define(function (options) {
 
-        this.callback = function (fn) {
+        this.callback = function callback(fn) {
           options.deferred.callback(fn);
           return this;
         };
         this.done = this.callback;
         this.succeess = this.callback;
 
-        this.errback = function (fn) {
+        this.errback = function errback(fn) {
           options.deferred.errback(fn);
           return this;
         };
@@ -124,7 +124,7 @@ SOFTWARE.
       // registered using this method, or its aliases, are passed in a
       // single value as input. This input parameter is the resolved
       // value for the deferred.
-      DeferredObject.prototype.callback = function (fn) {
+      DeferredObject.prototype.callback = function callback(fn) {
 
         if (this.failed === true) {
 
@@ -158,7 +158,7 @@ SOFTWARE.
       // an error is thrown. Callbacks registered using this method, and
       // its aliases, are passed a single input parameter that contains
       // the error that was thrown.
-      DeferredObject.prototype.errback = function (fn) {
+      DeferredObject.prototype.errback = function errback(fn) {
 
         if (this.resolved === true) {
 
@@ -228,7 +228,7 @@ SOFTWARE.
       //
       // This method only triggers the callbacks once after which
       // neither it nor the `fail` method have any effect.
-      DeferredObject.prototype.resolve = function (value) {
+      DeferredObject.prototype.resolve = function resolve(value) {
 
         // TypeError if value is the deferred.
         // A+ Promise Resolution Procedure 1.
@@ -290,7 +290,7 @@ SOFTWARE.
       //
       // This method only triggers the errbacks once after which
       // neither it nor the `resolve` method have any effect.
-      DeferredObject.prototype.fail = function (value) {
+      DeferredObject.prototype.fail = function fail(value) {
 
         var x;
 
@@ -318,7 +318,7 @@ SOFTWARE.
       // Deferreds should never be returned directly to avoid the potential
       // of runtime manipulation. Instead, return the value of this method
       // any time that you would normally want to return the deferred.
-      DeferredObject.prototype.promise = function () {
+      DeferredObject.prototype.promise = function promise() {
 
         return new PromiseObject({"deferred": this});
 
@@ -335,6 +335,7 @@ SOFTWARE.
             d = new DeferredObject(),
             x;
 
+          args.reverse();
           for (x = args.length - 1; x >= 0; x = x - 1) {
 
             args[x].errback(defer.bind(d.fail, d));
