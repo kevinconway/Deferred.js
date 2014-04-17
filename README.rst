@@ -2,7 +2,7 @@
 Deferred.js
 ===========
 
-**Cross platform deferred objects.**
+**Cross platform, A+ compliant promises.**
 
 .. image:: https://travis-ci.org/kevinconway/Deferred.js.png?branch=master
     :target: https://travis-ci.org/kevinconway/Deferred.js
@@ -14,17 +14,17 @@ What Is Deferred?
 A deferred is an object that represents a future value. Its purpose is to help
 simplify async programming patterns.
 
-This package contains several tools similar in nature to Promises. However,
-this package is not compliant with the Promises/A+ specification or the pending
-ECMA draft.
+This package contains an implementation of the
+`Promises/A+ specification <https://github.com/promises-aplus/promises-spec>`_.
 
-For the purposes of this library, a deferred represents a future value and a
-promise is a read-only interface for a deferred.
+For the purposes of this library, a deferred is an A+ compliant thenable
+that represents a future value. A promise is an interface to a deferred that
+prevents accidental resolution or rejection.
 
 Show Me
 =======
 
-::
+.. code-block:: javascript
 
     // Wrap async operations in functions that return a deferred.
     function getRemoteData() {
@@ -49,20 +49,33 @@ Show Me
 
     }
 
-    // Now multiple callbacks can be added without nesting.
-
     var resultPromise = getRemoteData();
 
-    resultPromise.callback(function (value) {
+    // Each call to "then" produces a new promise that is resolved when the
+    // given handlers are executed. This makes it possible to create an async
+    // workflow without deeply nesting callbacks.
+    resultPromise.then(function (value) {
+        console.log("Got the data.");
         console.log(value);
-    });
-
-    resultPromise.errback(function (err) {
+        return someOtherAsyncFunction(value);
+    }).then(function (value) {
+        console.log("Got the result of someOtherAsyncFunction.")
+        console.log(value);
+    }, function (err) {
+        console.log("Something went wrong.");
         console.log(err);
     });
 
-    // At some point later:
-    // Console Outputs the contents of either `value` or `err`
+    // Alternatively, handlers can simply be added to a single promise if they
+    // require no chaining.
+    resultPromise.callback(function (value) {
+        console.log("One off success handler.");
+        console.log("Text appears after 'Got the data' from above.")
+    });
+    resultPromise.errback(function (err) {
+        console.log("One off rejection handler.");
+        console.log("Text appears after 'Something went wrong' from above.")
+    });
 
 For more detailed usage guides and API specifications, see the docs directory.
 
