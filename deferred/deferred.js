@@ -37,6 +37,50 @@ SOFTWARE.
         PromiseObject,
         CollectionModule;
 
+      function executeAndReturnPromise(fn) {
+
+        var fnPromise,
+          args = Array.prototype.slice.call(arguments, 1),
+          d = new DeferredObject();
+
+        try {
+
+          fnPromise = fn.apply(null, args);
+          if (!!fnPromise && !!fnPromise.then &&
+              typeof fnPromise.then === 'function') {
+
+            return fnPromise;
+
+          }
+
+          d.resolve(fnPromise);
+
+        } catch (e) {
+
+          d.fail(e);
+
+        }
+
+        return d.promise();
+
+      }
+
+      function convert(fn) {
+
+        return defer.bind(executeAndReturnPromise, null, fn);
+
+      }
+
+      function proxy(deferred, fn) {
+
+        var args = Array.prototype.slice.call(arguments, 2),
+          p = convert(fn).apply(null, args);
+
+        p.callback(defer.bind(deferred.resolve, deferred));
+        p.errback(defer.bind(deferred.fail, deferred));
+
+      }
+
       PromiseObject = Modelo.define(function (options) {
 
         this.callback = function (fn) {
@@ -52,6 +96,10 @@ SOFTWARE.
         };
         this.failure = this.errback;
         this.error = this.errback;
+
+        this.then = function then(cback, eback) {
+          return options.deferred.then(cback, eback);
+        };
 
       });
 
@@ -131,6 +179,36 @@ SOFTWARE.
       DeferredObject.prototype.failure = DeferredObject.prototype.errback;
       DeferredObject.prototype.error = DeferredObject.prototype.errback;
 
+      DeferredObject.prototype.then = function then(callback, errback) {
+
+        var d = new DeferredObject();
+
+        if (typeof callback !== 'function') {
+
+          callback = defer.bind(d.resolve, d);
+
+        } else {
+
+          callback = defer.bind(proxy, null, d, callback);
+
+        }
+
+        if (typeof errback !== 'function') {
+
+          errback = defer.bind(d.fail, d);
+
+        } else {
+
+          errback = defer.bind(proxy, null, d, errback);
+
+        }
+
+        this.callback(callback);
+        this.errback(errback);
+
+        return d.promise();
+
+      };
 
       // This method is used to mark the deferred as resolved and
       // to execute all the success callbacks registered. The value
@@ -141,6 +219,14 @@ SOFTWARE.
       // neither it nor the `fail` method have any effect.
       DeferredObject.prototype.resolve = function (value) {
 
+        // TypeError if value is the deferred.
+        // A+ Promise Resolution Procedure 1.
+        if (value === this) {
+
+          throw new TypeError("Cannot resolve a deferred with itself.");
+
+        }
+
         var x;
 
         if (this.resolved === true || this.failed === true) {
@@ -149,8 +235,30 @@ SOFTWARE.
 
         }
 
-        this.resolved = true;
+        // Value is a promise. Adopt the state.
+        // If value is thenable but 'then' fails: fail with a reason.
+        // A+ Promise Resolution Procedure 2 and 3.
+        if (!!value && !!value.then && typeof value.then === "function") {
+
+          try {
+
+            value.then(
+              defer.bind(this.resolve, this),
+              defer.bind(this.fail, this)
+            );
+
+          } catch (err) {
+
+            this.fail(err);
+
+          }
+
+          return this;
+
+        }
+
         this.value = value;
+        this.resolved = true;
 
         this.callbacks.reverse();
         for (x = this.callbacks.length - 1; x >= 0; x = x - 1) {

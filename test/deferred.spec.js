@@ -6,7 +6,7 @@
 
   generator.call(
     context,
-    'deferredjs',
+    'tests/deferredjs',
     ['expect', 'deferredjs'],
     function (expect, Deferred) {
 
