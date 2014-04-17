@@ -408,6 +408,10 @@ SOFTWARE.
       // generator methods.
       Deferred.Collection = CollectionModule;
 
+      // Expose the converter to help developers interacting with non-compliant
+      // or synchronous libraries.
+      Deferred.convert = convert;
+
       return Deferred;
 
     }

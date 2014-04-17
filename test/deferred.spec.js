@@ -32,6 +32,8 @@
 
           expect(typeof Deferred.Collection.Any).to.be("function");
 
+          expect(typeof Deferred.convert).to.be("function");
+
         });
 
         it('handles async callbacks', function (done) {
@@ -150,6 +152,57 @@
             d1.resolve(true);
             d2.resolve(false);
             d3.resolve(null);
+
+          });
+
+        });
+
+        describe('The convert function', function () {
+
+          it('transforms normal functions to produce promises', function (done) {
+
+            var p = Deferred.convert(function () { return false; })();
+
+            expect(p).to.be.ok();
+            expect(p.then).to.be.ok();
+            expect(p.callback).to.be.ok();
+            expect(p.errback).to.be.ok();
+
+            p.callback(function (v) {
+
+              expect(v).to.be(false);
+              done();
+            });
+
+          });
+
+          it('converts exceptions to rejections', function (done) {
+
+            var e = new SyntaxError(),
+              p = Deferred.convert(function () { throw e; })();
+
+            p.errback(function (r) {
+
+              expect(r).to.be(e);
+              done();
+            });
+
+          });
+
+          it('passes promises through unchanged', function (done) {
+
+            var d = new Deferred(),
+              p1 = d.promise(),
+              p2 = Deferred.convert(function () { return p1; })();
+
+            p2.callback(function (v) {
+
+              expect(v).to.be(false);
+              done();
+
+            });
+
+            d.resolve(false);
 
           });
 
