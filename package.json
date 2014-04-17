@@ -1,7 +1,7 @@
 {
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
-  "description": "Deferred objects with event support",
+  "description": "Cross platform, A+ compliant promises.",
   "version": "4.1.0",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
