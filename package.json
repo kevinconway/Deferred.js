@@ -2,7 +2,7 @@
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
   "description": "Cross platform, A+ compliant promises.",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
     "type": "git",
@@ -10,13 +10,24 @@
   },
   "main": "./deferred/deferred.js",
   "scripts": {
-    "test": "./test/install_libs && mocha"
+    "test": "grunt"
   },
   "dependencies": {
-    "modelo": "3.x.x",
-    "deferjs": ">=2.1.x <3.0.0"
+    "modelo": "4.x.x",
+    "deferjs": "3.x.x"
     },
-  "devDependencies": {},
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "grunt": "^0.4.4",
+    "grunt-browserify": "^2.1.3",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jslint": "^1.1.8",
+    "grunt-mocha": "^0.4.11",
+    "grunt-mocha-test": "^0.10.2",
+    "grunt-shell": "^0.7.0",
+    "mocha": "^1.20.1"
+  },
   "optionalDependencies": {},
   "engines": {
     "node": "*"

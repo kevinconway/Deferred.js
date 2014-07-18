@@ -3,20 +3,9 @@
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${TEST_DIR}/lib"
 MODULES_DIR="$(readlink -f "${TEST_DIR}/../node_modules")"
-DEFERRED_DIR="$(readlink -f "${TEST_DIR}/../")"
 
 mkdir -p "${LIB_DIR}"
 mkdir -p "${MODULES_DIR}"
-
-pushd "${DEFERRED_DIR}"
-    npm install --silent
-popd
-
-if [[ ! -a "${LIB_DIR}/expect.js" ]]; then
-    wget \
-    https://raw.githubusercontent.com/LearnBoost/expect.js/master/index.js \
-    -O "${LIB_DIR}/expect.js" -q
-fi
 
 if [[ ! -a "${LIB_DIR}/mocha.js" ]]; then
     wget https://raw.githubusercontent.com/visionmedia/mocha/master/mocha.js \
@@ -26,24 +15,4 @@ fi
 if [[ ! -a "${LIB_DIR}/mocha.css" ]]; then
     wget https://raw.githubusercontent.com/visionmedia/mocha/master/mocha.css \
     -O "${LIB_DIR}/mocha.css" -q
-fi
-
-if [[ ! -a "${LIB_DIR}/modelo.js" ]]; then
-    ln -s "${MODULES_DIR}/modelo/modelo/modelo.js" "${LIB_DIR}/modelo.js"
-fi
-
-if [[ ! -a "${LIB_DIR}/defer.js" ]]; then
-    ln -s "${MODULES_DIR}/deferjs/defer/defer.js" "${LIB_DIR}/defer.js"
-fi
-
-if [[ ! -a "${MODULES_DIR}/deferredjs" ]]; then
-    ln -s "${DEFERRED_DIR}" "${MODULES_DIR}/deferredjs"
-fi
-
-if [[ ! -a "${LIB_DIR}/deferred.js" ]]; then
-    ln -s "${DEFERRED_DIR}/deferred/deferred.js" "${LIB_DIR}/deferred.js"
-fi
-
-if [[ ! -a "${MODULES_DIR}/expect.js" ]]; then
-    ln -s "${LIB_DIR}/expect.js" "${MODULES_DIR}/expect.js"
 fi
