@@ -108,10 +108,11 @@ for demonstration:
 Callback/Errback Aggregation
 ----------------------------
 
-The 'then' method can be called on a promise any number of time to continue
-added addition callbacks or errbacks to be triggered. 'then' is all you really
+The 'then' method can be called on a promise any number of times to continue
+adding addition callbacks or errbacks to be triggered. 'then' is all you really
 need. If preferred, however, you can choose to use the 'callback' and 'errback'
-methods to accomplish the same aggregation:
+methods the desire is to simply add multiple callbacks/errbacks when the value
+is ready. This pattern is not recommended:
 
 .. code-block:: javascript
 
@@ -161,7 +162,7 @@ Wrapping Synchronous Code
 Not everything involved in a project is going to be asynchronous and produce
 thenables. This is particularly true when working with third party libraries.
 In the event that you need to run synchronous code but want it to tie into the
-programming patterns created by and play nicely with thenables use the given
+programming patterns created by, and play nicely with, thenables use the given
 converter function to wrap them:
 
 .. code-block:: javascript

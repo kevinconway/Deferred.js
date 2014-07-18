@@ -1,292 +1,208 @@
 /*jslint node: true, indent: 2, passfail: true */
 /*globals describe, it */
 
-(function (context, generator) {
-  "use strict";
+"use strict";
 
-  generator.call(
-    context,
-    'tests/deferredjs',
-    ['expect', 'deferredjs'],
-    function (expect, Deferred) {
+var expect = require('expect.js'),
+  Deferred = require('../deferred/deferred.js');
 
-      describe('The Deferred library', function () {
+describe('The Deferred library', function () {
 
-        it('loads in the current environment', function () {
+  it('loads in the current environment', function () {
 
-          expect(Deferred).to.be.ok();
+    expect(Deferred).to.be.ok();
 
-        });
+  });
 
-        it('exposes a specification compliant interface', function () {
+  it('exposes a specification compliant interface', function () {
 
-          expect(typeof Deferred).to.be("function");
+    expect(typeof Deferred).to.be("function");
 
-          expect(typeof Deferred.Deferred).to.be("function");
+    expect(typeof Deferred.Deferred).to.be("function");
 
-          expect(typeof Deferred.Promise).to.be("function");
+    expect(typeof Deferred.Promise).to.be("function");
 
-          expect(typeof Deferred.Collection).to.be("object");
+    expect(typeof Deferred.Collection).to.be("object");
 
-          expect(typeof Deferred.Collection.All).to.be("function");
+    expect(typeof Deferred.Collection.All).to.be("function");
 
-          expect(typeof Deferred.Collection.Any).to.be("function");
+    expect(typeof Deferred.Collection.Any).to.be("function");
 
-          expect(typeof Deferred.convert).to.be("function");
+    expect(typeof Deferred.convert).to.be("function");
 
-        });
+  });
 
-        it('handles async callbacks', function (done) {
+  it('handles async callbacks', function (done) {
 
-          var t = new Deferred(),
-            successObject = {};
+    var t = new Deferred(),
+      successObject = {};
 
-          t.callback(function (value) {
+    t.callback(function (value) {
 
-            successObject.test = value;
+      successObject.test = value;
 
-            expect(successObject.test).to.be(value);
+      expect(successObject.test).to.be(value);
 
-            done();
+      done();
 
-          });
+    });
 
-          t.resolve(true);
+    t.resolve(true);
 
-          expect(successObject.test).to.be(undefined);
+    expect(successObject.test).to.be(undefined);
 
-        });
+  });
 
-        it('handles async errbacks', function (done) {
+  it('handles async errbacks', function (done) {
 
-          var t = new Deferred(),
-            errorObject = {};
+    var t = new Deferred(),
+      errorObject = {};
 
-          t.errback(function (value) {
+    t.errback(function (value) {
 
-            errorObject.test = value;
+      errorObject.test = value;
 
-            expect(errorObject.test).to.be(value);
+      expect(errorObject.test).to.be(value);
 
-            done();
+      done();
 
-          });
+    });
 
-          t.fail(true);
+    t.fail(true);
 
-          expect(errorObject.test).to.be(undefined);
+    expect(errorObject.test).to.be(undefined);
 
-        });
+  });
 
-        it('produces a limited promise object', function (done) {
+  it('produces a limited promise object', function (done) {
 
-          var t = new Deferred(),
-            p = t.promise(),
-            successObject = {};
+    var t = new Deferred(),
+      p = t.promise(),
+      successObject = {};
 
-          expect(p.callback).to.be.ok(t.callback);
-          expect(p.value).to.be(undefined);
-          expect(p.callbacks).to.be(undefined);
-          expect(p.errbacks).to.be(undefined);
+    expect(p.callback).to.be.ok(t.callback);
+    expect(p.value).to.be(undefined);
+    expect(p.callbacks).to.be(undefined);
+    expect(p.errbacks).to.be(undefined);
 
-          p.callback(function (value) {
-            successObject.test = value;
+    p.callback(function (value) {
+      successObject.test = value;
 
-            expect(successObject.test).to.be(value);
+      expect(successObject.test).to.be(value);
 
-            done();
+      done();
 
-          });
+    });
 
-          expect(p.resolve).to.be(undefined);
+    expect(p.resolve).to.be(undefined);
 
-          expect(successObject.test).to.be(undefined);
+    expect(successObject.test).to.be(undefined);
 
-          t.resolve();
+    t.resolve();
 
-        });
+  });
 
-        describe('The Any Collection', function () {
+  describe('The Any Collection', function () {
 
-          it('Resolves on the first resolved promise.', function (done) {
+    it('Resolves on the first resolved promise.', function (done) {
 
-            var d1 = new Deferred(),
-              d2 = new Deferred(),
-              d3 = new Deferred(),
-              c = Deferred.Collection.Any(d1, d2, d3);
+      var d1 = new Deferred(),
+        d2 = new Deferred(),
+        d3 = new Deferred(),
+        c = Deferred.Collection.Any(d1, d2, d3);
 
-            c.callback(function (value) {
+      c.callback(function (value) {
 
-              expect(value).to.be(true);
-              done();
-
-            });
-
-            d1.resolve(true);
-            d2.resolve(false);
-            d3.resolve(false);
-
-          });
-
-        });
-
-        describe('The All Collection', function () {
-
-          it('Resolves after all promises', function (done) {
-
-            var d1 = new Deferred(),
-              d2 = new Deferred(),
-              d3 = new Deferred(),
-              c = Deferred.Collection.All(d1, d2, d3);
-
-            c.callback(function (values) {
-
-              expect(values.length).to.be(3);
-              expect(values[0]).to.be(true);
-              expect(values[1]).to.be(false);
-              expect(values[2]).to.be(null);
-              done();
-
-            });
-
-            d1.resolve(true);
-            d2.resolve(false);
-            d3.resolve(null);
-
-          });
-
-        });
-
-        describe('The convert function', function () {
-
-          it('transforms normal functions to produce promises', function (done) {
-
-            var p = Deferred.convert(function () { return false; })();
-
-            expect(p).to.be.ok();
-            expect(p.then).to.be.ok();
-            expect(p.callback).to.be.ok();
-            expect(p.errback).to.be.ok();
-
-            p.callback(function (v) {
-
-              expect(v).to.be(false);
-              done();
-            });
-
-          });
-
-          it('converts exceptions to rejections', function (done) {
-
-            var e = new SyntaxError(),
-              p = Deferred.convert(function () { throw e; })();
-
-            p.errback(function (r) {
-
-              expect(r).to.be(e);
-              done();
-            });
-
-          });
-
-          it('passes promises through unchanged', function (done) {
-
-            var d = new Deferred(),
-              p1 = d.promise(),
-              p2 = Deferred.convert(function () { return p1; })();
-
-            p2.callback(function (v) {
-
-              expect(v).to.be(false);
-              done();
-
-            });
-
-            d.resolve(false);
-
-          });
-
-        });
+        expect(value).to.be(true);
+        done();
 
       });
-    }
-  );
 
-}(this, (function (context) {
-  "use strict";
+      d1.resolve(true);
+      d2.resolve(false);
+      d3.resolve(false);
 
-  // Ignoring the unused "name" in the Node.js definition function.
-  /*jslint unparam: true */
-  if (typeof require === "function" &&
-        module !== undefined &&
-        !!module.exports) {
+    });
 
-    // If this module is loaded in Node, require each of the
-    // dependencies and pass them along.
-    return function (name, deps, mod) {
+  });
 
-      var x,
-        dep_list = [];
+  describe('The All Collection', function () {
 
-      for (x = 0; x < deps.length; x = x + 1) {
+    it('Resolves after all promises', function (done) {
 
-        dep_list.push(require(deps[x]));
+      var d1 = new Deferred(),
+        d2 = new Deferred(),
+        d3 = new Deferred(),
+        c = Deferred.Collection.All(d1, d2, d3);
 
-      }
+      c.callback(function (values) {
 
-      module.exports = mod.apply(context, dep_list);
+        expect(values.length).to.be(3);
+        expect(values[0]).to.be(true);
+        expect(values[1]).to.be(false);
+        expect(values[2]).to.be(null);
+        done();
 
-    };
+      });
 
-  }
-  /*jslint unparam: false */
+      d1.resolve(true);
+      d2.resolve(false);
+      d3.resolve(null);
 
-  if (context.window !== undefined) {
+    });
 
-    // If this module is being used in a browser environment first
-    // generate a list of dependencies, run the provided definition
-    // function with the list of dependencies, and insert the returned
-    // object into the global namespace using the provided module name.
-    return function (name, deps, mod) {
+  });
 
-      var namespaces = name.split('/'),
-        root = context,
-        dep_list = [],
-        current_scope,
-        current_dep,
-        i,
-        x;
+  describe('The convert function', function () {
 
-      for (i = 0; i < deps.length; i = i + 1) {
+    it('transforms normal functions to produce promises', function (done) {
 
-        current_scope = root;
-        current_dep = deps[i].split('/');
+      var p = Deferred.convert(function () { return false; })();
 
-        for (x = 0; x < current_dep.length; x = x + 1) {
+      expect(p).to.be.ok();
+      expect(p.then).to.be.ok();
+      expect(p.callback).to.be.ok();
+      expect(p.errback).to.be.ok();
 
-          current_scope = current_scope[current_dep[x]] =
-                          current_scope[current_dep[x]] || {};
+      p.callback(function (v) {
 
-        }
+        expect(v).to.be(false);
+        done();
+      });
 
-        dep_list.push(current_scope);
+    });
 
-      }
+    it('converts exceptions to rejections', function (done) {
 
-      current_scope = root;
-      for (i = 1; i < namespaces.length; i = i + 1) {
+      var e = new SyntaxError(),
+        p = Deferred.convert(function () { throw e; })();
 
-        current_scope = current_scope[namespaces[i - 1]] =
-                        current_scope[namespaces[i - 1]] || {};
+      p.errback(function (r) {
 
-      }
+        expect(r).to.be(e);
+        done();
+      });
 
-      current_scope[namespaces[i - 1]] = mod.apply(context, dep_list);
+    });
 
-    };
+    it('passes promises through unchanged', function (done) {
 
-  }
+      var d = new Deferred(),
+        p1 = d.promise(),
+        p2 = Deferred.convert(function () { return p1; })();
 
-  throw new Error("Unrecognized environment.");
+      p2.callback(function (v) {
 
-}(this))));
+        expect(v).to.be(false);
+        done();
+
+      });
+
+      d.resolve(false);
+
+    });
+
+  });
+
+});
+

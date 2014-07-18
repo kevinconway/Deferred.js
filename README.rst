@@ -94,29 +94,20 @@ Once installed, simply `Deferred = require("deferredjs")`.
 Browser
 -------
 
-Developers working with a normal browser environment can use regular script
-tags to load the package. This package has dependencies on these other
-packages:
+This module uses browserify to create a browser compatible module. The default
+grunt workflow for this project will generate both a full and minified browser
+script in a build directory which can be included as a <script> tag::
 
--   `Modelo <https://github.com/kevinconway/Modelo.js>`_
+    <script src="deferred.browser.min.js"></script>
 
--   `Defer <https://github.com/kevinconway/Defer.js>`_
-
-The load order should be something like this::
-
-    <script src="modelo.js"></script>
-    <script src="defer.js"></script>
-    <script src="deferred.js"></script>
-
-The package loads into a global variable named `deferredjs`.
+The package is exposed via the global name `deferredjs`.
 
 Tests
 -----
 
-To run the tests in Node.js use the `npm test` command.
-
-To run the tests in a browser, run the `install_libs` script in the test
-directory and then open the `runner.html` in the browser of your choice.
+Running the `npm test` command will kick off the default grunt workflow. This
+will lint using jslint, run the mocha/expect tests, generate a browser module,
+and test the browser module using PhantomJS.
 
 License
 =======
