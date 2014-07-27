@@ -27,60 +27,66 @@ SOFTWARE.
 
 module.exports = (function () {
 
-  var xbind = require('deferjs').bind,
-    Rejectable = require('./base').Rejectable,
-    Resolvable = require('./base').Resolvable,
-    thenable = require('./thenable'),
-    Thenable = thenable.Thenable,
-    Promise,
-    Deferred;
+  var Deferred = require('./deferred'),
+    xbind = require('deferjs').bind,
+    AnyCollection,
+    AllCollection;
 
-  Promise = Thenable.extend();
-  Promise.prototype.resolve = undefined;
-  Promise.prototype.reject = undefined;
-  Promise.prototype.resolveValue = undefined;
+  AnyCollection = function AnyCollection() {
 
-  // Private method to check if a promise came from a given deferred.
-  function isFrom(d) {
+    var args = Array.prototype.slice.call(arguments),
+      d = new Deferred(),
+      x;
 
-    return d === this;
+    args.reverse();
+    for (x = args.length - 1; x >= 0; x = x - 1) {
 
-  }
+      args[x].then(
+        xbind(d.resolve, d),
+        xbind(d.reject, d)
+      );
 
-  Deferred = Thenable.extend();
-  Deferred.prototype.promise = function promise() {
+    }
 
-    var p = new Promise();
-    this.then(
-      xbind(Resolvable.prototype.resolve, p),
-      xbind(Rejectable.prototype.reject, p)
-    );
-    p.isFrom = isFrom.bind(this);
-
-    return p;
+    return d.promise();
 
   };
-  Deferred.prototype.resolveValue = function resolveValue(value) {
 
-    if (!!value && !!value.isFrom && typeof value.isFrom === 'function') {
+  AllCollection = function AllCollection() {
 
-      if (value.isFrom(this)) {
+    var args = Array.prototype.slice.call(arguments),
+      d = new Deferred(),
+      values = [],
+      x;
 
-        Rejectable.prototype.reject.call(
-          this,
-          new TypeError("Cannot resolve a promise with itself.")
-        );
-        return this;
+    function resolve(value) {
+
+      values.push(value);
+
+      if (values.length === args.length) {
+
+        d.resolve(values);
 
       }
 
     }
 
-    Thenable.prototype.resolveValue.call(this, value);
-    return this;
+    for (x = args.length - 1; x >= 0; x = x - 1) {
+
+      args[x].then(
+        resolve,
+        xbind(d.reject, d)
+      );
+
+    }
+
+    return d.promise();
 
   };
 
-  return Deferred;
+  return {
+    "All": AllCollection,
+    "Any": AnyCollection
+  };
 
 }());

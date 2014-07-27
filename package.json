@@ -1,14 +1,20 @@
 {
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
-  "description": "Cross platform, A+ compliant promises.",
-  "version": "5.0.0",
+  "description": "Cross platform, A+ 1.1.1 compliant promises.",
+  "version": "6.0.0",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/kevinconway/Deferred.js.git"
   },
-  "main": "./deferred/deferred.js",
+  "keywords": [
+    "promises-aplus",
+    "deferred",
+    "deferreds",
+    "promises"
+  ],
+  "main": "./deferred/index.js",
   "scripts": {
     "test": "grunt"
   },
@@ -26,7 +32,8 @@
     "grunt-mocha": "^0.4.11",
     "grunt-mocha-test": "^0.10.2",
     "grunt-shell": "^0.7.0",
-    "mocha": "^1.20.1"
+    "mocha": "^1.20.1",
+    "promises-aplus-tests": "*"
   },
   "optionalDependencies": {},
   "engines": {

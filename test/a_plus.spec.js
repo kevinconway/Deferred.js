@@ -1,5 +1,5 @@
 /*jslint node: true, indent: 2, passfail: true */
-/*globals describe, xdescribe, it, xit */
+/*globals describe, it */
 
 "use strict";
 
@@ -371,24 +371,6 @@ describe('The "then" Method', function () {
 
   });
 
-  xdescribe('5. onFulfilled and onRejected must be called with no "this" value', function () {
-
-    it('Specification disregards bound functions. Skipping this clause.');
-
-    it('5.1 onFulfilled must be called with no "this" value', function (done) {
-
-      done();
-
-    });
-
-    it('5.2 onRejected must be called with no "this" value', function (done) {
-
-      done();
-
-    });
-
-  });
-
   describe('6. then may be called multiple times on the same promise', function () {
 
     it('6.1 onFulfilled callbacks must execute in order', function (done) {
@@ -600,23 +582,13 @@ describe('The "then" Method', function () {
 
 describe('The Promise Resolution Procedure', function () {
 
-  it('1. Throws TypeError if promise resolved with itself', function (done) {
+  it('1. Reject with TypeError if promise resolved with itself', function (done) {
 
     var d = new Deferred();
 
-    try {
+    d.then(expect().fail, function () { done(); });
 
-      d.resolve(d);
-      expect().fail();
-
-    } catch (e) {
-
-      if (e instanceof TypeError) {
-
-        done();
-
-      }
-    }
+    d.resolve(d);
 
   });
 
