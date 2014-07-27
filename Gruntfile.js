@@ -28,13 +28,11 @@ module.exports = function (grunt) {
         src: ['test/*.spec.js']
       },
     },
-    // Automated browser tests disabled due to bug that causes tests to
-    // appear as though they fail. Open the runner.html instead to test.
-    // mocha: {
-    //   test: {
-    //     src: ['test/runner.html']
-    //   }
-    // },
+    mocha: {
+      test: {
+        src: ['test/runner.html']
+      }
+    },
     browserify: {
       dist: {
         files: {
@@ -89,6 +87,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-mocha');
   grunt.loadNpmTasks('grunt-shell');
 
-  grunt.registerTask('default', ['jslint', 'mochaTest', 'browserify', 'uglify', 'shell']);
+  grunt.registerTask('default', ['jslint', 'mochaTest', 'browserify', 'uglify', 'shell', 'mocha']);
 
 };

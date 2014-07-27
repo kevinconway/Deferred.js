@@ -55,7 +55,7 @@ module.exports = (function () {
       xbind(Resolvable.prototype.resolve, p),
       xbind(Rejectable.prototype.reject, p)
     );
-    p.isFrom = isFrom.bind(this);
+    p.isFrom = xbind(isFrom, this);
 
     return p;
 
