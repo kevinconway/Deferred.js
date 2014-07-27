@@ -28,59 +28,42 @@ SOFTWARE.
 module.exports = (function () {
 
   var xbind = require('deferjs').bind,
-    Rejectable = require('./base').Rejectable,
-    Resolvable = require('./base').Resolvable,
-    thenable = require('./thenable'),
-    Thenable = thenable.Thenable,
-    Promise,
-    Deferred;
+    pkg = {
+      "Deferred": require('./deferred'),
+      "collection": require('./collection'),
+      "thenable": require('./thenable'),
+      "locks": require('./locks'),
+      "base": require('./base')
+    };
 
-  Promise = Thenable.extend();
-  Promise.prototype.resolve = undefined;
-  Promise.prototype.reject = undefined;
-  Promise.prototype.resolveValue = undefined;
+  // Convert a thenable into a native promise. If value is not thenable the
+  // promise comes pre-resolved with the value.
+  function when(thenable) {
 
-  // Private method to check if a promise came from a given deferred.
-  function isFrom(d) {
+    var t = new pkg.Deferred(),
+      then;
 
-    return d === this;
+    then = pkg.thenable.isThenable(thenable);
 
-  }
+    if (then === false) {
 
-  Deferred = Thenable.extend();
-  Deferred.prototype.promise = function promise() {
+      t.resolve(thenable);
 
-    var p = new Promise();
-    this.then(
-      xbind(Resolvable.prototype.resolve, p),
-      xbind(Rejectable.prototype.reject, p)
-    );
-    p.isFrom = isFrom.bind(this);
+    } else {
 
-    return p;
-
-  };
-  Deferred.prototype.resolveValue = function resolveValue(value) {
-
-    if (!!value && !!value.isFrom && typeof value.isFrom === 'function') {
-
-      if (value.isFrom(this)) {
-
-        Rejectable.prototype.reject.call(
-          this,
-          new TypeError("Cannot resolve a promise with itself.")
-        );
-        return this;
-
-      }
+      then(
+        xbind(t.resolve, t),
+        xbind(t.reject, t)
+      );
 
     }
 
-    Thenable.prototype.resolveValue.call(this, value);
-    return this;
+    return t.promise();
 
-  };
+  }
 
-  return Deferred;
+  pkg.when = when;
+
+  return pkg;
 
 }());

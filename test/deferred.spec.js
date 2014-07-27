@@ -4,31 +4,16 @@
 "use strict";
 
 var expect = require('expect.js'),
-  Deferred = require('../deferred/deferred.js');
+  pkg = require('../deferred/index'),
+  Deferred = pkg.Deferred,
+  collection = pkg.collection,
+  when = pkg.when;
 
 describe('The Deferred library', function () {
 
   it('loads in the current environment', function () {
 
     expect(Deferred).to.be.ok();
-
-  });
-
-  it('exposes a specification compliant interface', function () {
-
-    expect(typeof Deferred).to.be("function");
-
-    expect(typeof Deferred.Deferred).to.be("function");
-
-    expect(typeof Deferred.Promise).to.be("function");
-
-    expect(typeof Deferred.Collection).to.be("object");
-
-    expect(typeof Deferred.Collection.All).to.be("function");
-
-    expect(typeof Deferred.Collection.Any).to.be("function");
-
-    expect(typeof Deferred.convert).to.be("function");
 
   });
 
@@ -68,7 +53,7 @@ describe('The Deferred library', function () {
 
     });
 
-    t.fail(true);
+    t.reject(true);
 
     expect(errorObject.test).to.be(undefined);
 
@@ -80,10 +65,8 @@ describe('The Deferred library', function () {
       p = t.promise(),
       successObject = {};
 
-    expect(p.callback).to.be.ok(t.callback);
-    expect(p.value).to.be(undefined);
-    expect(p.callbacks).to.be(undefined);
-    expect(p.errbacks).to.be(undefined);
+    expect(p.resolve).to.be(undefined);
+    expect(p.reject).to.be(undefined);
 
     p.callback(function (value) {
       successObject.test = value;
@@ -93,8 +76,6 @@ describe('The Deferred library', function () {
       done();
 
     });
-
-    expect(p.resolve).to.be(undefined);
 
     expect(successObject.test).to.be(undefined);
 
@@ -109,7 +90,7 @@ describe('The Deferred library', function () {
       var d1 = new Deferred(),
         d2 = new Deferred(),
         d3 = new Deferred(),
-        c = Deferred.Collection.Any(d1, d2, d3);
+        c = collection.Any(d1, d2, d3);
 
       c.callback(function (value) {
 
@@ -133,7 +114,7 @@ describe('The Deferred library', function () {
       var d1 = new Deferred(),
         d2 = new Deferred(),
         d3 = new Deferred(),
-        c = Deferred.Collection.All(d1, d2, d3);
+        c = collection.All(d1, d2, d3);
 
       c.callback(function (values) {
 
@@ -153,33 +134,18 @@ describe('The Deferred library', function () {
 
   });
 
-  describe('The convert function', function () {
+  describe('The when function', function () {
 
-    it('transforms normal functions to produce promises', function (done) {
+    it('transforms normal values into promises', function (done) {
 
-      var p = Deferred.convert(function () { return false; })();
+      var p = when(false);
 
       expect(p).to.be.ok();
       expect(p.then).to.be.ok();
-      expect(p.callback).to.be.ok();
-      expect(p.errback).to.be.ok();
 
-      p.callback(function (v) {
+      p.then(function (v) {
 
         expect(v).to.be(false);
-        done();
-      });
-
-    });
-
-    it('converts exceptions to rejections', function (done) {
-
-      var e = new SyntaxError(),
-        p = Deferred.convert(function () { throw e; })();
-
-      p.errback(function (r) {
-
-        expect(r).to.be(e);
         done();
       });
 
@@ -189,9 +155,9 @@ describe('The Deferred library', function () {
 
       var d = new Deferred(),
         p1 = d.promise(),
-        p2 = Deferred.convert(function () { return p1; })();
+        p2 = when(p1);
 
-      p2.callback(function (v) {
+      p2.then(function (v) {
 
         expect(v).to.be(false);
         done();

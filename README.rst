@@ -2,7 +2,11 @@
 Deferred.js
 ===========
 
-**Cross platform, A+ compliant promises.**
+**Cross platform, A+ 1.1.1 compliant promises.**
+
+.. image:: http://promisesaplus.com/assets/logo-small.png
+    :target: http://promisesaplus.com
+    :alt: Promises/A+ 1.1.1 Compliant
 
 .. image:: https://travis-ci.org/kevinconway/Deferred.js.png?branch=master
     :target: https://travis-ci.org/kevinconway/Deferred.js
@@ -66,17 +70,6 @@ Show Me
         console.log(err);
     });
 
-    // Alternatively, handlers can simply be added to a single promise if they
-    // require no chaining.
-    resultPromise.callback(function (value) {
-        console.log("One off success handler.");
-        console.log("Text appears after 'Got the data' from above.")
-    });
-    resultPromise.errback(function (err) {
-        console.log("One off rejection handler.");
-        console.log("Text appears after 'Something went wrong' from above.")
-    });
-
 For more detailed usage guides and API specifications, see the docs directory.
 
 Setup
@@ -89,7 +82,7 @@ This package is published through NPM under the name `deferredjs`::
 
     $ npm install deferredjs
 
-Once installed, simply `Deferred = require("deferredjs")`.
+Once installed, simply `Deferred = require("deferredjs").Deferred`.
 
 Browser
 -------
