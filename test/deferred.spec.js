@@ -4,10 +4,12 @@
 "use strict";
 
 var expect = require('expect.js'),
+  dns = require('dns'),
   pkg = require('../deferred/index'),
   Deferred = pkg.Deferred,
   collection = pkg.collection,
-  when = pkg.when;
+  when = pkg.when,
+  convert = pkg.convert;
 
 describe('The Deferred library', function () {
 
@@ -165,6 +167,21 @@ describe('The Deferred library', function () {
       });
 
       d.resolve(false);
+
+    });
+
+  });
+
+  describe('The convert function', function () {
+
+    it('handles callbacks for Node.js style functions', function (done) {
+
+      var c = convert(dns.resolve4);
+
+      c('google.com').then(function (addresses) {
+        expect(addresses).to.be.ok();
+        done();
+      });
 
     });
 

@@ -66,6 +66,33 @@ module.exports = (function () {
 
   pkg.when = when;
 
+  function handleCallback(deferred, err, value) {
+    if (!!err) {
+      deferred.reject(err);
+      return;
+    }
+    deferred.resolve(value);
+  }
+  // Convert a Node.js callback style function into a function that generates
+  // a promise.
+  function convert(fn) {
+
+    return function conversion() {
+      var args = Array.prototype.slice.call(arguments),
+        d = new pkg.Deferred();
+      args.push(handleCallback.bind(undefined, d));
+      try {
+        fn.apply(undefined, args);
+      } catch (err) {
+        d.reject(err);
+      }
+      return d.promise();
+    };
+
+  }
+
+  pkg.convert = convert;
+
   return pkg;
 
 }());
