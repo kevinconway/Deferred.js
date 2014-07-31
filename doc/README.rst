@@ -50,7 +50,7 @@ specification. Here is how the terms will be used in this document:
 
 -   Collection
 
-    A specialized promise that resolves only after one or more other deferred
+    A specialized promise that resolves only after one or more other thenable
     objects resolve.
 
 Usage Examples
@@ -59,76 +59,30 @@ Usage Examples
 Simple Use
 ----------
 
-This examples uses jQuery to demonstrate how deferreds can help change the
-pattern of async code. This module does not require jQuery. It is simply used
-for demonstration:
+Each call to 'then' produces a new promise. This can be used to create async
+task chains.
 
 .. code-block:: javascript
 
-    // Wrap async operations in functions that return a deferred.
-    function getRemoteData() {
-
-        var deferred = new deferredjs.Deferred();
-
-        // Note: jQuery is not required and only used here for demonstration.
-        $.ajax({
-            url: "myDataServer.com",
-            success: function (data) {
-
-                deferred.resolve(data);
-
-            },
-            error: function (jqxhr, status, err) {
-                deferred.fail(err);
-            }
-
-        });
-
-        return deferred.promise();
-
+    function ajax(endpoint) {
+        var d = new deferredjs.Deferred();
+        // Do async ajax stuff and call d.resolve with the response.
+        return d.promise();
     }
 
-    var resultPromise = getRemoteData();
-
-    // Each call to "then" produces a new promise that is resolved when the
-    // given handlers are executed. This makes it possible to create an async
-    // workflow without deeply nesting callbacks.
-    resultPromise.then(function (value) {
-        console.log("Got the data.");
-        console.log(value);
-        return someOtherAsyncFunction(value);
-    }).then(function (value) {
-        console.log("Got the result of someOtherAsyncFunction.")
-        console.log(value);
-    }, function (err) {
-        console.log("Something went wrong.");
-        console.log(err);
-    });
+    ajax('api.somesite.com').then(saveToDb).then(printToUser, handleError);
 
 Callback/Errback Aggregation
 ----------------------------
 
-The 'then' method can be called on a promise any number of times to continue
-adding addition callbacks or errbacks to be triggered. 'then' is all you really
-need. If preferred, however, you can choose to use the 'callback' and 'errback'
-methods if the desire is to simply add multiple callbacks/errbacks when the
-value is ready. This pattern is not recommended:
+Both parameters for the 'then' method are optional. If either the callback or
+errback parameter is not needed, however, you can use the 'callback' and
+'errback' helpers.
 
 .. code-block:: javascript
 
-    // Alternatively, handlers can simply be added to a single promise if they
-    // require no chaining.
-    resultPromise.callback(function (value) {
-        console.log("One off success handler.");
-        console.log("Text appears after 'Got the data' from above.")
-    });
-    resultPromise.errback(function (err) {
-        console.log("One off rejection handler.");
-        console.log("Text appears after 'Something went wrong' from above.")
-    });
-
-It is important to note that the 'callback' and 'errback' methods do not
-return a thenable.
+    var p = ajax('api.somesite.com').callback(saveToDb).callback(print)
+    p = p.errback(handleAllErrors);
 
 Using A Collection
 ------------------
@@ -171,11 +125,11 @@ converter function to wrap them:
         return true;
     }
 
-    var thenableTrue = deferredjs.thenable.when(returnTrue());
+    var thenableTrue = deferredjs.when(returnTrue());
     thenableTrue().then(function (value) { console.log(value); }); // true.
 
-This wrapper resolves to a no-op if the function you wrap already produces
-a thenable.
+If the value is already thenable it is converted into a promise from this
+library.
 
 API Reference
 =============
@@ -188,175 +142,40 @@ Node.js::
     var Deferred = require('deferredjs').Deferred;
     var when = require('deferredjs').when;
 
-    var thenable = require('deferredjs').thenable;
-    var Thenable = thenable.Thenable;
-    var isNativeThenable = thenable.isNativeThenable;
-    var isThenable = thenable.isThenable;
-
     var collection = require('deferredjs').collection;
     var All = collection.All;
     var Any = collection.Any;
 
-    var locks = require('deferredjs').locks;
-    var runOnce = locks.runOnce;
-    var runOne = locks.runOne;
-
-    var base = require('deferredjs').base;
-    var Resolvable = base.Resolvable;
-    var Rejectable = base.Rejectable;
-    var SingleUseCallbackAggregator = base.SingleUseCallbackAggregator;
-    var CallbackAggregator = base.CallbackAggregator;
-
 In a browser environment, the Deferred library will load in the global
 `deferredjs`.
-
-CallbackAggregator
-------------------
-
-Object which manages the aggregation and execution of callbacks. The
-constructor takes no arguments.
-
-add(fn)
-^^^^^^^
-
-Place a function on the callback queue. Raises TypeError if not a function.
-
-execute(...)
-^^^^^^^^^^^^
-
-Execute all callbacks in order. All arguments given are passed into each
-callback. All callbacks are executed asynchronously.
-
-SingleUseCallbackAggregator
----------------------------
-
-Extension of CallbackAggregator which only executes once. The constructor
-takes no arguments.
-
-add(fn)
-^^^^^^^
-
-Raises TypeError if input is not a function.
-
-Place a function on the callback queue if execute has not run yet. Otherwise
-immediately defer the function for asynchronous execution.
-
-execute(...)
-^^^^^^^^^^^^
-
-Execute all callbacks in order. All arguments given are passed into each
-callback. All callbacks are executed asynchronously. This only works once. All
-subsequent calls are no-ops.
-
-Resolvable
-----------
-
-Object containing a SingleUseCallbackAggregator which can be resolved with a
-single value. That value it used in the callback execute calls. The constructor
-takes no arguments
-
-callback(fn)
-^^^^^^^^^^^^
-
-Add a callback to the queue. Raises TypeError if input is not a function.
-
-complete()
-^^^^^^^^^^
-
-Return true or false based on whether or not the object has processed the
-callbacks.
-
-resolve(value)
-^^^^^^^^^^^^^^
-
-Execute all the callbacks with the given value.
-
-Rejectable
-----------
-
-Object containing a SingleUseCallbackAggregator which can be resolved with a
-single value. That value it used in the errbacks execute calls. The constructor
-takes no arguments
-
-errback(fn)
-^^^^^^^^^^^^
-
-Add an errback to the queue. Raises TypeError if input is not a function.
-
-complete()
-^^^^^^^^^^
-
-Return true or false based on whether or not the object has processed the
-errbacks.
-
-reject(reason)
-^^^^^^^^^^^^^^
-
-Execute all the errbacks with the given reason.
-
-runOnce(fn)
------------
-
-Returns a wrapped version of 'fn' which only runs once. All subsequent calls
-are ignored.
-
-runOne()
---------
-
-Return a function wrapper which can be applied to any number of functions.
-The wrapper ensures that only one of the functions wrapped will be run. All
-subsequent calls to all functions, including the one that executed, are
-ignored.
 
 when(value)
 -----------
 
-If value is a thenable this function resolves to a no-op. If the value is not
-a thenable it returns a thenable which is already resolved with the given
-value.
-
-isNativeThenable(thenable)
---------------------------
-
-Returns true or false based on whether or not the given thenable is an instance
-of the Thenable object.
-
-isThenable(thenable)
---------------------
-
-If the object given is not a thenable the value 'false' is returned. Otherwise
-the return value is a bound version of the 'then' method from the thenable.
-
-Thenable
---------
-
-A basic deferred object which represent a future value.
-
-complete()
-^^^^^^^^^^
-
-Return true or false based on whether or not the object has been resolved or
-rejected.
-
-then(onResolve, onReject)
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A+ compliant 'then' method. Returns a Thenable.
-
-resolve(value)
-^^^^^^^^^^^^^^
-
-Resolves the Thenable using the A+ promise resolution logic.
-
-reject(reason)
-^^^^^^^^^^^^^^
-
-Rejects the Thenable.
+If the value is not thenable it returns a thenable which is already resolved
+with the given value. If the value is already thenable it is converted into a
+promise from this library.
 
 Deferred
 --------
 
-Extension of the Thenable object. Can generate promises.
+An A+ compliant thenable.
+
+then(onResolve, onReject)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Produce a new promise that is resolved or rejected based on the behaviour of
+onResolve and onReject.
+
+callback(onResolve)
+^^^^^^^^^^^^^^^^^^^
+
+Executes 'then' without a second argument.
+
+errback(onReject)
+^^^^^^^^^^^^^^^^^
+
+Executes 'then' without a first argument.
 
 promise()
 ^^^^^^^^^
@@ -367,7 +186,8 @@ rejected.
 Promise
 -------
 
-Extension of the Thenable object and limited interface for a deferred.
+An interface for a deferred that does not contain the reject or resolve
+methods. All other methods of Deferred are exposed.
 
 isFrom(deferred)
 ^^^^^^^^^^^^^^^^
