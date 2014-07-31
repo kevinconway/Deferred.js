@@ -28,7 +28,6 @@ SOFTWARE.
 module.exports = (function () {
 
   var Deferred = require('./deferred'),
-    xbind = require('deferjs').bind,
     AnyCollection,
     AllCollection;
 
@@ -42,8 +41,8 @@ module.exports = (function () {
     for (x = args.length - 1; x >= 0; x = x - 1) {
 
       args[x].then(
-        xbind(d.resolve, d),
-        xbind(d.reject, d)
+        d.resolve.bind(d),
+        d.reject.bind(d)
       );
 
     }
@@ -75,7 +74,7 @@ module.exports = (function () {
 
       args[x].then(
         resolve,
-        xbind(d.reject, d)
+        d.reject.bind(d)
       );
 
     }
