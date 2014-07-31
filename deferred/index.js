@@ -27,13 +27,9 @@ SOFTWARE.
 
 module.exports = (function () {
 
-  var xbind = require('deferjs').bind,
-    pkg = {
+  var pkg = {
       "Deferred": require('./deferred'),
-      "collection": require('./collection'),
-      "thenable": require('./thenable'),
-      "locks": require('./locks'),
-      "base": require('./base')
+      "collection": require('./collection')
     };
 
   // Convert a thenable into a native promise. If value is not thenable the
@@ -41,21 +37,27 @@ module.exports = (function () {
   function when(thenable) {
 
     var t = new pkg.Deferred(),
-      then;
+      then,
+      isThenable;
 
-    then = pkg.thenable.isThenable(thenable);
+    isThenable = (
+      !!thenable &&
+      (typeof thenable === 'function' || typeof thenable === 'object')
+    );
 
-    if (then === false) {
+    if (isThenable === true) {
+      then = thenable.then;
+      isThenable = typeof then === 'function';
+    }
 
-      t.resolve(thenable);
-
-    } else {
-
-      then(
-        xbind(t.resolve, t),
-        xbind(t.reject, t)
+    if (!!then && isThenable === true) {
+      then.call(
+        thenable,
+        t.resolve.bind(t),
+        t.reject.bind(t)
       );
-
+    } else {
+      t.resolve(thenable);
     }
 
     return t.promise();
@@ -63,6 +65,33 @@ module.exports = (function () {
   }
 
   pkg.when = when;
+
+  function handleCallback(deferred, err, value) {
+    if (!!err) {
+      deferred.reject(err);
+      return;
+    }
+    deferred.resolve(value);
+  }
+  // Convert a Node.js callback style function into a function that generates
+  // a promise.
+  function convert(fn) {
+
+    return function conversion() {
+      var args = Array.prototype.slice.call(arguments),
+        d = new pkg.Deferred();
+      args.push(handleCallback.bind(undefined, d));
+      try {
+        fn.apply(undefined, args);
+      } catch (err) {
+        d.reject(err);
+      }
+      return d.promise();
+    };
+
+  }
+
+  pkg.convert = convert;
 
   return pkg;
 

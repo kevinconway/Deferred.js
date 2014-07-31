@@ -30,45 +30,7 @@ Show Me
 
 .. code-block:: javascript
 
-    // Wrap async operations in functions that return a deferred.
-    function getRemoteData() {
-
-        var deferred = new Deferred();
-
-        // Note: jQuery is not required and only used here for demonstration.
-        $.ajax({
-            url: "myDataServer.com",
-            success: function (data) {
-
-                deferred.resolve(data);
-
-            },
-            error: function (jqxhr, status, err) {
-                deferred.fail(err);
-            }
-
-        });
-
-        return deferred.promise();
-
-    }
-
-    var resultPromise = getRemoteData();
-
-    // Each call to "then" produces a new promise that is resolved when the
-    // given handlers are executed. This makes it possible to create an async
-    // workflow without deeply nesting callbacks.
-    resultPromise.then(function (value) {
-        console.log("Got the data.");
-        console.log(value);
-        return someOtherAsyncFunction(value);
-    }).then(function (value) {
-        console.log("Got the result of someOtherAsyncFunction.")
-        console.log(value);
-    }, function (err) {
-        console.log("Something went wrong.");
-        console.log(err);
-    });
+    ajax('api.somesite.com').then(saveToDb).then(printToUser, handleError)
 
 For more detailed usage guides and API specifications, see the docs directory.
 
