@@ -185,6 +185,17 @@ describe('The Deferred library', function () {
 
     });
 
+    it('handles callbacks for Node.js style functions with multiple values', function (done) {
+
+      var c = convert(dns.lookup);
+      c('google.com').then(function (address, family) {
+        expect(address).to.be.ok();
+        expect(family).to.be.ok();
+        done();
+      });
+
+    });
+
   });
 
 });

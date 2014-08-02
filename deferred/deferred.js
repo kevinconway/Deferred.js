@@ -52,13 +52,18 @@ module.exports = (function () {
     // 2 => resolved, 1 => resolving
     this.state = 0;
     this.value = undefined;
+    this.multipleValues = false;
   }
   Deferred.prototype.rejectDeferreds = function rejectDeferreds() {
     var next;
     while (this.thens.length > 0) {
       next = this.thens.shift();
       try {
-        next.promise.resolve(next.onReject.call(undefined, this.value));
+        if (this.multipleValues === true) {
+          next.promise.resolve(next.onReject.apply(undefined, this.value));
+        } else {
+          next.promise.resolve(next.onReject.call(undefined, this.value));
+        }
       } catch (err) {
         next.promise.reject(err);
       }
@@ -69,7 +74,11 @@ module.exports = (function () {
     while (this.thens.length > 0) {
       next = this.thens.shift();
       try {
-        next.promise.resolve(next.onResolve.call(undefined, this.value));
+        if (this.multipleValues === true) {
+          next.promise.resolve(next.onResolve.apply(undefined, this.value));
+        } else {
+          next.promise.resolve(next.onResolve.call(undefined, this.value));
+        }
       } catch (err) {
         next.promise.reject(err);
       }
@@ -78,16 +87,21 @@ module.exports = (function () {
   Deferred.prototype.rejectWithReason = function rejectWithReason(reason) {
     // Set state to rejected.
     this.state = -2;
-    this.value = reason;
+    if (arguments.length === 1) {
+      this.value = reason;
+    } else {
+      this.multipleValues = true;
+      this.value = arguments;
+    }
     defer(this.rejectDeferreds.bind(this));
   };
-  Deferred.prototype.reject = function reject(reason) {
+  Deferred.prototype.reject = function reject() {
     if (this.state !== 0) {
       return;
     }
     // Set state to rejecting.
     this.state = -1;
-    this.rejectWithReason(reason);
+    this.rejectWithReason.apply(this, arguments);
   };
   Deferred.prototype.resolveWithValue = function resolveWithValue(value) {
     // If complete, don't do any more.
@@ -114,7 +128,12 @@ module.exports = (function () {
     }
     // Set state to resolved.
     this.state = 2;
-    this.value = value;
+    if (arguments.length === 1) {
+      this.value = value;
+    } else {
+      this.multipleValues = true;
+      this.value = arguments;
+    }
     defer(this.resolveDeferreds.bind(this));
   };
   Deferred.prototype.resolve = function resolve(value) {
@@ -130,7 +149,7 @@ module.exports = (function () {
     }
     // Set state to resolving.
     this.state = 1;
-    this.resolveWithValue(value);
+    this.resolveWithValue.apply(this, arguments);
   };
   Deferred.prototype.then = function then(onResolve, onReject) {
     var p = new Deferred();
