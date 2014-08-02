@@ -66,12 +66,12 @@ module.exports = (function () {
 
   pkg.when = when;
 
-  function handleCallback(deferred, err, value) {
+  function handleCallback(deferred, err) {
     if (!!err) {
       deferred.reject(err);
       return;
     }
-    deferred.resolve(value);
+    deferred.resolve.apply(deferred, Array.prototype.slice.call(arguments, 2));
   }
   // Convert a Node.js callback style function into a function that generates
   // a promise.
