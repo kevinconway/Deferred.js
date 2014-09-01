@@ -128,8 +128,8 @@ describe('The Deferred library', function () {
 
       });
 
-      d1.resolve(true);
       d2.resolve(false);
+      d1.resolve(true);
       d3.resolve(null);
 
     });

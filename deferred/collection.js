@@ -58,9 +58,9 @@ module.exports = (function () {
       values = [],
       x;
 
-    function resolve(value) {
+    function resolve(offset, value) {
 
-      values.push(value);
+      values[offset] = value;
 
       if (values.length === args.length) {
 
@@ -73,7 +73,7 @@ module.exports = (function () {
     for (x = args.length - 1; x >= 0; x = x - 1) {
 
       args[x].then(
-        resolve,
+        resolve.bind(undefined, x),
         d.reject.bind(d)
       );
 
