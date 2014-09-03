@@ -56,13 +56,15 @@ module.exports = (function () {
     var args = Array.prototype.slice.call(arguments),
       d = new Deferred(),
       values = [],
+      count = { "value": 0 },
       x;
 
     function resolve(offset, value) {
 
       values[offset] = value;
+      count.value = count.value + 1;
 
-      if (values.length === args.length) {
+      if (count.value >= args.length) {
 
         d.resolve(values);
 
