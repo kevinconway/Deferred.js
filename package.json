@@ -2,7 +2,7 @@
   "author": "Kevin Conway <kevinjacobconway@gmail.com> (https://github.com/kevinconway)",
   "name": "deferredjs",
   "description": "Cross platform, A+ 1.1.1 compliant promises.",
-  "version": "7.1.1",
+  "version": "7.1.2",
   "homepage": "https://github.com/kevinconway/Deferred.js",
   "repository": {
     "type": "git",
