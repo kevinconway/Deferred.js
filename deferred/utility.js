@@ -27,68 +27,46 @@ SOFTWARE.
 
 module.exports = (function () {
 
-  var Deferred = require('./deferred'),
-    args = require('./utility').args,
-    AnyCollection,
-    AllCollection;
+  // Wrapper generator which ensures only one of the wrapped function is
+  // executed and is executed only once.
+  function chooseOne(thisArg) {
+    var state = { "ran": false };
+    return function chooseOne(fn) {
+      return function chooseOne() {
+        if (state.ran === false) {
+          state.ran = true;
+          fn.apply(thisArg, arguments);
+        }
+      };
+    };
+  }
 
-  AnyCollection = function AnyCollection() {
-
-    var promises = args.apply(undefined, arguments),
-      d = new Deferred(),
-      x,
-      length = promises.length;
-
-    for (x = 0; x < length; x = x + 1) {
-
-      promises[x].then(
-        d.resolve.bind(d),
-        d.reject.bind(d)
-      );
-
-    }
-
-    return d.promise();
-
-  };
-
-  AllCollection = function AllCollection() {
-
-    var promises = args.apply(undefined, arguments),
-      d = new Deferred(),
-      values = [],
-      count = { "value": 0 },
+  // Convert arguments into an array.
+  function args() {
+    var results = [],
+      length = arguments.length,
       x;
 
-    function resolve(offset, value) {
-
-      values[offset] = value;
-      count.value = count.value + 1;
-
-      if (count.value >= promises.length) {
-
-        d.resolve(values);
-
-      }
-
+    for (x = 0; x < length; x = x + 1) {
+      results[x] = arguments[x];
     }
 
-    for (x = promises.length - 1; x >= 0; x = x - 1) {
+    return results;
+  }
 
-      promises[x].then(
-        resolve.bind(undefined, x),
-        d.reject.bind(d)
-      );
-
+  // Marginalized try/catch block.
+  function tryCatch(t, c) {
+    try {
+      return t();
+    } catch (err) {
+      return c(err);
     }
-
-    return d.promise();
-
-  };
+  }
 
   return {
-    "All": AllCollection,
-    "Any": AnyCollection
+    "chooseOne": chooseOne,
+    "args": args,
+    "tryCatch": tryCatch
   };
 
 }());

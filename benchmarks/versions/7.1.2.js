@@ -25,17 +25,25 @@ SOFTWARE.
 "use strict";
 module.exports = (function () {
 
-  var defer = require('deferjs'),
-    chooseOne = require('./utility').chooseOne,
-    tryCatch = require('./utility').tryCatch,
-    args = require('./utility').args;
+  var defer = require('deferjs');
 
-  // Default onResolve and onReject methods.
-  function passResult(r) {
-    return r;
+  // Wrapper generator which ensures only one of the wrapped functions is
+  // executed and is executed only once.
+  function chooseOne(thisArg) {
+    var state = { "ran": false };
+    return function chooseOne(fn) {
+      return function chooseOne() {
+        if (state.ran === false) {
+          state.ran = true;
+          fn.apply(thisArg, arguments);
+        }
+      };
+    };
   }
-  function passError(e) {
-    throw e;
+  // Method that promises can use to identify themselves as having been
+  // produced by a deferred without exposes access to the deferred.
+  function isFromDeferred(possible) {
+    return this === possible;
   }
   function Deferred() {
     this.thens = [];
@@ -46,47 +54,44 @@ module.exports = (function () {
     this.value = undefined;
     this.multipleValues = false;
   }
-  function Resolver(promise, provider, value, multiple) {
-    return function () {
-      if (multiple) {
-        promise.resolve(provider.apply(undefined, value));
-        return undefined;
-      }
-      promise.resolve(provider.call(undefined, value));
-    };
-  }
-  function Rejector(promise) {
-    return function (err) {
-      promise.reject(err);
-    };
-  }
   Deferred.prototype.rejectDeferreds = function rejectDeferreds() {
     var next;
     while (this.thens.length > 0) {
       next = this.thens.shift();
-      tryCatch(
-        new Resolver(next.promise, next.onReject, this.value, this.multipleValues),
-        new Rejector(next.promise)
-      );
+      try {
+        if (this.multipleValues === true) {
+          next.promise.resolve(next.onReject.apply(undefined, this.value));
+        } else {
+          next.promise.resolve(next.onReject.call(undefined, this.value));
+        }
+      } catch (err) {
+        next.promise.reject(err);
+      }
     }
   };
   Deferred.prototype.resolveDeferreds = function resolveDeferreds() {
     var next;
     while (this.thens.length > 0) {
       next = this.thens.shift();
-      tryCatch(
-        new Resolver(next.promise, next.onResolve, this.value, this.multipleValues),
-        new Rejector(next.promise)
-      );
+      try {
+        if (this.multipleValues === true) {
+          next.promise.resolve(next.onResolve.apply(undefined, this.value));
+        } else {
+          next.promise.resolve(next.onResolve.call(undefined, this.value));
+        }
+      } catch (err) {
+        next.promise.reject(err);
+      }
     }
   };
   Deferred.prototype.rejectWithReason = function rejectWithReason(reason) {
     // Set state to rejected.
     this.state = -2;
-    this.value = reason;
-    if (arguments.length > 1) {
-      this.value = args.apply(undefined, arguments);
+    if (arguments.length === 1) {
+      this.value = reason;
+    } else {
       this.multipleValues = true;
+      this.value = arguments;
     }
     defer(this.rejectDeferreds.bind(this));
   };
@@ -98,48 +103,37 @@ module.exports = (function () {
     this.state = -1;
     this.rejectWithReason.apply(this, arguments);
   };
-  Deferred.prototype.resolveWithDispatch = function resolveWithDispatch() {
+  Deferred.prototype.resolveWithValue = function resolveWithValue(value) {
+    // If complete, don't do any more.
     if (this.state === -2 || this.state === 2) {
       return;
     }
-    if (arguments.length > 1) {
-      this.resolveWithValues.apply(this, arguments);
-      return;
-    }
-    this.resolveWithValue.apply(this, arguments);
-  };
-  Deferred.prototype.resolveWithValues = function resolveWithValues() {
-    this.state = 2;
-    this.value = args.apply(undefined, arguments);
-    this.multipleValues = true;
-    defer(this.resolveDeferreds.bind(this));
-  };
-  Deferred.prototype.resolveWithValue = function resolveWithValue(value) {
-    var lock = chooseOne(this), stop,
-      reject = lock(this.rejectWithReason),
-      resolve = lock(this.resolveWithValue);
-
-    function tryThenable() {
-      var then = value.then;
-      if (typeof then === 'function') {
-        then.call(value, resolve, reject);
-        return true;
-      }
-      return false;
-    }
-    function catchThenable(err) {
-      reject(err);
-      return true;
-    }
+    var lock = chooseOne(this), then;
     if (!!value && (typeof value === 'function' || typeof value === 'object')) {
-      stop = tryCatch(tryThenable, catchThenable);
-      if (stop === true) {
+      try {
+        then = value.then;
+        if (typeof then === 'function') {
+          // Set state to resolving
+          then.call(
+            value,
+            lock(this.resolveWithValue),
+            lock(this.rejectWithReason)
+          );
+          return;
+        }
+      } catch (err) {
+        lock(this.rejectWithReason)(err);
         return;
       }
     }
     // Set state to resolved.
     this.state = 2;
-    this.value = value;
+    if (arguments.length === 1) {
+      this.value = value;
+    } else {
+      this.multipleValues = true;
+      this.value = arguments;
+    }
     defer(this.resolveDeferreds.bind(this));
   };
   Deferred.prototype.resolve = function resolve(value) {
@@ -155,13 +149,13 @@ module.exports = (function () {
     }
     // Set state to resolving.
     this.state = 1;
-    this.resolveWithDispatch.apply(this, arguments);
+    this.resolveWithValue.apply(this, arguments);
   };
   Deferred.prototype.then = function then(onResolve, onReject) {
     var p = new Deferred();
     this.thens.push({
-      'onResolve': typeof onResolve === 'function' ? onResolve : passResult,
-      'onReject': typeof onReject === 'function' ? onReject : passError,
+      'onResolve': typeof onResolve === 'function' ? onResolve : p.resolve.bind(p),
+      'onReject': typeof onReject === 'function' ? onReject : p.reject.bind(p),
       'promise': p
     });
     // If complete, simply execute the resolution/rejection.
@@ -186,28 +180,12 @@ module.exports = (function () {
   // Produce a new interface for the deferred that cannot be resolved or
   // rejected.
   Deferred.prototype.promise = function promise() {
-    // Using a reference to this because defining these functions using a scope
-    // closure is measurable faster than using bind.
-    var self = this;
-    function then(res, rej) {
-      return self.then(res, rej);
-    }
-    function callback(res) {
-      return self.callback(res);
-    }
-    function errback(rej) {
-      return self.errback(rej);
-    }
-    function isFrom(p) {
-      return self === p;
-    }
     return {
-      "then": then,
-      "callback": callback,
-      "errback": errback,
-      "isFromDeferred": isFrom
+      "then": this.then.bind(this),
+      "callback": this.callback.bind(this),
+      "errback": this.errback.bind(this),
+      "isFromDeferred": isFromDeferred.bind(this)
     };
-
   };
 
   return Deferred;
