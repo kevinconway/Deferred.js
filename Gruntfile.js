@@ -68,6 +68,11 @@ module.exports = function (grunt) {
     shell: {
       prepareBrowserTests: {
         command: 'test/install_libs'
+      },
+      benchmark: {
+        command: function (path) {
+          return 'node ' + path;
+        }
       }
     },
     watch: {
@@ -89,6 +94,15 @@ module.exports = function (grunt) {
 
   // Browser tests fail on TravisCI but pass locally. Use the runner.html
   // to test the browser functionality until this is resolved.
-  grunt.registerTask('default', ['jslint', 'mochaTest', 'browserify', 'uglify', 'shell']);
+  grunt.registerTask('default', ['jslint', 'mochaTest', 'browserify', 'uglify', 'shell:prepareBrowserTests']);
+  grunt.registerTask('build', ['browserify', 'uglify', 'shell:prepareBrowserTests']);
+  grunt.registerTask('benchmark', [
+    'shell:benchmark:benchmarks/comparisons/instance.js',
+    'shell:benchmark:benchmarks/comparisons/resolve.js',
+    'shell:benchmark:benchmarks/comparisons/resolveMultiple.js',
+    'shell:benchmark:benchmarks/comparisons/resolvePromise.js',
+    'shell:benchmark:benchmarks/comparisons/then.js',
+    'shell:benchmark:benchmarks/comparisons/thenMultiple.js'
+  ]);
 
 };

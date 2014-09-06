@@ -192,7 +192,7 @@ describe('The Deferred library', function () {
         expect(address).to.be.ok();
         expect(family).to.be.ok();
         done();
-      });
+      }).then(undefined, done);
 
     });
 

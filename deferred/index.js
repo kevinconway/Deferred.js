@@ -30,7 +30,8 @@ module.exports = (function () {
   var pkg = {
       "Deferred": require('./deferred'),
       "collection": require('./collection')
-    };
+    },
+    args = require('./utility').args;
 
   // Convert a thenable into a native promise. If value is not thenable the
   // promise comes pre-resolved with the value.
@@ -71,18 +72,18 @@ module.exports = (function () {
       deferred.reject(err);
       return;
     }
-    deferred.resolve.apply(deferred, Array.prototype.slice.call(arguments, 2));
+    deferred.resolve.apply(deferred, args.apply(undefined, arguments).slice(2));
   }
   // Convert a Node.js callback style function into a function that generates
   // a promise.
   function convert(fn) {
 
     return function conversion() {
-      var args = Array.prototype.slice.call(arguments),
+      var params = args.apply(undefined, arguments),
         d = new pkg.Deferred();
-      args.push(handleCallback.bind(undefined, d));
+      params.push(handleCallback.bind(undefined, d));
       try {
-        fn.apply(undefined, args);
+        fn.apply(undefined, params);
       } catch (err) {
         d.reject(err);
       }
